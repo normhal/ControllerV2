@@ -44,7 +44,7 @@ void initPage(uint8_t page)
     //******************************************************************************************************************************
     case ThrottlePage:
     {  
-      wait(50);
+    //  wait(50);
       populateSlots();
       activateSlot(activeSlot);
       break;

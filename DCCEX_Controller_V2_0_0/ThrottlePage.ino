@@ -94,14 +94,14 @@ void throttlePage(uint8_t button)
       {
         wait(20);
         int response = nextionGetValue("T");
-        Serial.print("Response: ");
-        Serial.println(response);
+//        Serial.print("Response: ");
+//        Serial.println(response);
         if(response != -1)
         {
           encoderPos = response;
           auto th = throttles[activeSlot];
-          Loco *loco = th->getLoco();
-          dccexProtocol.setThrottle(loco, response, loco->getDirection());
+          Loco *activeLoco = th->getLoco();
+          dccexProtocol.setThrottle(activeLoco, response, activeLoco->getDirection());
         }
       }
       break;
@@ -119,6 +119,8 @@ void throttlePage(uint8_t button)
     }
     default:                                                  
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process the Pressed Tab
       {
         if(guestActive == true)
@@ -149,7 +151,15 @@ void throttlePage(uint8_t button)
           uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
           if(funcNum == 127) break;
           uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
-          nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(toggleFunction(funcNum & 0x7F, funcImg))).c_str());
+          if(activeLoco->isFunctionOn(funcNum))
+          {
+            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg)));
+            dccexProtocol.functionOff(activeLoco, funcNum);
+          }else
+          {
+            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg+1)));
+            dccexProtocol.functionOn(activeLoco, funcNum);
+          }
           break;
         }
         if(button >= FunctionReleaseStart && button < (FunctionReleaseStart + functionsPerPage))
@@ -158,7 +168,8 @@ void throttlePage(uint8_t button)
           if((funcNum & 0x80) != 0)     //fType == PULSE)
           {
             uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
-            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(toggleFunction(funcNum & 0x7F, funcImg))).c_str());
+            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg)));
+            dccexProtocol.functionOff(activeLoco, funcNum);
           }
         }
         break;
@@ -267,8 +278,6 @@ void activateSlot(uint8_t slot)
       auto th = throttles[activeSlot];
       Loco *loco = th->getLoco();
       dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
-      Serial.printf("Loco Address: &d", th);
-      Serial.printf(" Speed Set to: &d", loco->getSpeed());
     }else
     { 
       setHeadingDetails(slot);                                             //Update the Page Heading Info
@@ -283,18 +292,13 @@ void activateSlot(uint8_t slot)
           nextionSetText("v" + String(slot), String(readLocoRNum(selectedIDs[slot])));
         }
         nextionCommand("v" + String(slot) + ".pco=" + String(BLACK));   //Font Colour
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
         auto th = throttles[activeSlot];
         Loco *loco = th->getLoco();
         dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
-//        updateNextionThrottle(locos[selectedIDs[slot]].speed);
         updateNextionThrottle(loco->getSpeed());
-//        nextionSetValue(F("FR"), (locos[selectedIDs[slot]].dir));
         nextionSetValue(F("FR"), (loco->getDirection()));
-//        nextionSetText("AD", String(readLocoAddress(selectedIDs[slot])));
         nextionSetText("AD", String(loco->getAddress()));
         loadFunctions(ThrottlePage, selectedIDs[slot]);
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
       }    
     }
   }
@@ -317,17 +321,25 @@ void deActivateSlot(uint8_t slot)
 /*
  ***************************************************************************************************************
  * Define the 10 Function details and images on the displayed Page - either Throttle or Edit for Loco id
- * Current States of functions are NOT restored in EEPROM
+ * Current States of functions are NOT restored in EEPROM but in functions[][] array
+ * loadFunctions is called by PageInits and only applies to activeLoco
+ * Sequence of events:
+ * - Retrieve activeLoco function states from DCCEX (if not already retrieved)
+ * - using the EEPROM stored function slot function numbers and Images
+ * - create the 28 function states
  ***************************************************************************************************************
 */
 void loadFunctions(uint8_t Page, uint8_t locoID)
 {
-  for(uint8_t l_fSlot=0; l_fSlot<numFSlots; l_fSlot++)       //10 function slots representing 2 uint8_ts per group and on a page - never more:-)
+  auto th = throttles[activeSlot];
+  Loco *activeLoco = th->getLoco();
+  uint32_t functionStates = activeLoco->getFunctionStates();
+  for(uint8_t l_fSlot=0; l_fSlot<numFSlots; l_fSlot++) 
   {
     uint8_t fNum = readEEPROMByte((locoFuncBase + (locoID * 20)) + (l_fSlot*2));         // 20 bytes needed for 10 slots on a page
-    fNum = fNum & 0x7F;                         //Remove the pulse indicator bit
-    uint8_t iNum = readEEPROMByte((locoFuncBase + (locoID * 20)) + (l_fSlot*2)+1);
-    if (fNum <= 68)        //Maximum function number supported at this time
+    fNum = fNum & 0x7F;                                                                  //Remove the pulse indicator bit
+    uint8_t iNum = readEEPROMByte((locoFuncBase + (locoID * 20)) + (l_fSlot*2)+1);       // retrieve the image number
+    if(fNum <=68)
     {
       if (Page == LocoEditPage)
       {
@@ -336,10 +348,15 @@ void loadFunctions(uint8_t Page, uint8_t locoID)
         nextionCommand(("c" + String(l_fSlot)+".pco=0").c_str());           //Set colour to Black
         nextionSetText("c" + String(l_fSlot), "F");                    //Ensure "F" is displayed
       } //Both Pages
-      String nextionString = ("s" + String(l_fSlot) + ".pic=" + String(iNum + (functions[locoID][l_fSlot]))); //Function Image Slot
-      nextionCommand(nextionString.c_str());
-    }
-    else    //fNum == 127
+      if(bitRead(functionStates, fNum) == 0) 
+      {
+        nextionCommand("s" + String(l_fSlot) + ".pic=" + String(iNum));     //Image = Off
+      }
+      else 
+      {
+        nextionCommand("s" + String(l_fSlot) + ".pic=" + String(iNum+1));                                    //Image = On
+      }
+    }else
     {
       if (Page == LocoEditPage)
       {
@@ -348,11 +365,9 @@ void loadFunctions(uint8_t Page, uint8_t locoID)
         nextionSetText("c" + String(l_fSlot), "F"); 
         nextionCommand(("s" + String(l_fSlot) + ".pic=" + String(GREYED_BUTTON)).c_str());   //load greyed Function Image
       }else
-      {
-        nextionCommand(("s" + String(l_fSlot) + ".pic=" + String(BLANK)).c_str());   //load blank Function Image
-      }
-    } 
-  }
+      nextionCommand(("s" + String(l_fSlot) + ".pic=" + String(BLANK)).c_str());   //load blank Function Image
+    }
+  }  
 }
 /*
  ***************************************************************************************************************

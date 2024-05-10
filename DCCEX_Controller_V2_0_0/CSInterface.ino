@@ -59,8 +59,7 @@ uint8_t connectWiFi(uint8_t retries)
     console.println("Attempting to Connect");
     console.print("Using SSID: ");
     console.println(ssid);
-    console.print("and Password: ");
-    console.println(password);
+    console.print("and Password: ******");
     nextionSetText("WiFiState", "Please Wait...");
     uint8_t rcounts = 0;
     while(WiFi.status() != WL_CONNECTED) 
@@ -358,12 +357,16 @@ void doDCCfunction2128()
 #if !defined DCCPP
   void doDCCfunctions(uint8_t fNum)
   {
+    
+  }
+/*  {
     String dccppCMD = "";
     dccppCMD = ("<F " + String(readLocoAddress((selectedIDs[activeSlot]))) +
               " " + String(fNum) + 
               " " + String(functions[selectedIDs[activeSlot]][g_fSlot]) + ">");
     sendCMD(dccppCMD);
   }
+*/
 #endif
 /*
  *********************************************************
