@@ -60,21 +60,28 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == false)
-        {
+//        if(guestActive == false)
+//        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 1;
           activeLoco->setDirection(Direction::Forward);
           Serial.println("Direction set to Forward");
           nextionSetValue("FR", 1);
-          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) activeLoco->setSpeed(0);
+          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+          Serial.println();
+          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+          Serial.println();
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
+          {
+            activeLoco->setSpeed(0);
+            nextionSetValue("S1",0);
+          }
           dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-//          changeDir(dir);
-        }else{
-          guestDir = 1;
-          checkThreshold();
-          setGuest();
-        }
+//        }else{
+//          guestDir = 1;
+//          checkThreshold();
+//          setGuest();
+//        }
       }
       break;
     }
@@ -84,21 +91,28 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == false)
-        {
+//        if(guestActive == false)
+//        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 0;
           activeLoco->setDirection(Direction::Reverse);
           Serial.println("Direction set to Reverse");
+          Serial.println();
+          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+          Serial.println();
           nextionSetValue("FR", 0);
-          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) activeLoco->setSpeed(0);
+          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
+          {
+            activeLoco->setSpeed(0);
+            nextionSetValue("S1",0);
+          }
           dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-//          changeDir(dir);
-        }else{
-          guestDir = 0;
-          checkThreshold();
-          setGuest();
-        }
+//        }else{
+//          guestDir = 0;
+//          checkThreshold();
+//          setGuest();
+//       }
       }
       break;
     }
@@ -113,6 +127,7 @@ void throttlePage(uint8_t button)
         if(response != -1)
         {
           encoderPos = response;
+          activeLoco->setSpeed(response);
 //          auto th = throttles[activeSlot];
 //          Loco *activeLoco = th->getLoco();
           dccexProtocol.setThrottle(activeLoco, response, activeLoco->getDirection());

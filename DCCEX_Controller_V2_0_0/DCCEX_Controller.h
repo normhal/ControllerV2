@@ -15,9 +15,7 @@
 *  along with this program.  If not, see http://www.gnu.org/licenses
 *
 ************************************************************************/
-/* Copyright Norman Halland 2022
- * Header File for DCCEX_Controller
-*/
+
 #ifndef DCCEXCONTROLLER_H
   #define DCCEXCONTROLLER_H
 
@@ -27,7 +25,7 @@
   
   #include <EEPROM.h>
   #include <DCCEXProtocol.h>
-  #include <LittleFS.h>
+  //#include <LittleFS.h>
   
   #include "NextionButtons.h"
 

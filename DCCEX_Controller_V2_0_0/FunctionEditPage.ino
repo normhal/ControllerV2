@@ -28,7 +28,7 @@ void functionEditPage(uint8_t button)
     {
       if(deleteMode == 1)
       {
-        writeEEPROMByte((locoFuncBase + (editingID * 20)) + (g_fSlot*2), 128);
+        writeEEPROMByte((locoFuncBase + (editingID * 20)) + (g_fSlot*2), 127);
       }
       deleteMode = 0;
       nextionSetValue("D", 0);
