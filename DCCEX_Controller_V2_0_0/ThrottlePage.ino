@@ -56,51 +56,80 @@ void throttlePage(uint8_t button)
     }
     case ForwardButton:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == 0)
-        {
+//        if(guestActive == false)
+//        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-          dir = 1;
-          changeDir(dir);
-        }else{
-          guestDir = 1;
-          checkThreshold();
-          setGuest();
-        }
+//          dir = 1;
+          activeLoco->setDirection(Direction::Forward);
+          Serial.println("Direction set to Forward");
+          nextionSetValue("FR", 1);
+          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+          Serial.println();
+          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+          Serial.println();
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
+          {
+            activeLoco->setSpeed(0);
+            nextionSetValue("S1",0);
+          }
+          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+//        }else{
+//          guestDir = 1;
+//          checkThreshold();
+//          setGuest();
+//        }
       }
       break;
     }
     case ReverseButton:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == 0)
-        {
+//        if(guestActive == false)
+//        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-          dir = 0;
-          changeDir(dir);
-        }else{
-          guestDir = 0;
-          checkThreshold();
-          setGuest();
-        }
+//          dir = 0;
+          activeLoco->setDirection(Direction::Reverse);
+          Serial.println("Direction set to Reverse");
+          Serial.println();
+          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+          Serial.println();
+          nextionSetValue("FR", 0);
+          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
+          {
+            activeLoco->setSpeed(0);
+            nextionSetValue("S1",0);
+          }
+          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+//        }else{
+//          guestDir = 0;
+//          checkThreshold();
+//          setGuest();
+//       }
       }
       break;
     }
     case SliderEvent:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        wait(20);
+        wait(30);
         int response = nextionGetValue("T");
-//        Serial.print("Response: ");
-//        Serial.println(response);
         if(response != -1)
         {
           encoderPos = response;
-          auto th = throttles[activeSlot];
-          Loco *activeLoco = th->getLoco();
+          activeLoco->setSpeed(response);
+//          auto th = throttles[activeSlot];
+//          Loco *activeLoco = th->getLoco();
           dccexProtocol.setThrottle(activeLoco, response, activeLoco->getDirection());
         }
       }
@@ -500,7 +529,7 @@ void changeDir(uint8_t dir)
     encoderPos = 0;
     oldEncPos = 0;
   }
-  doDCC(activeSlot);
+  //doDCC(activeSlot);
 }
 /*
  **********************************************************************************************************

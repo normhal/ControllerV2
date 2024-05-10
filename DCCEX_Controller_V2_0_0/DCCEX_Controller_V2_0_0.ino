@@ -155,7 +155,9 @@ class MyDelegate : public DCCEXProtocolDelegate
       Serial.print(activeLoco->getSpeed());
       Serial.print(" Direction: ");
       Serial.println(activeLoco->getDirection());
+      wait(20);
       nextionSetValue("S1", activeLoco->getSpeed());
+      wait(20);
       nextionSetValue("T", activeLoco->getSpeed());
       if(activeLoco->getDirection() == Forward)
       {
@@ -242,6 +244,15 @@ void setup()
     selectedIDs[r] = readEEPROMByte(s);
     r++;
   }
+  joinMode = readEEPROMByte(eeJoinMode);
+  wifiSeconds = readEEPROMByte(eeWiFiSeconds);
+  
+  initPage(CoverPage);
+  wait(100);
+  nextionSetText("Version", Version);
+  wait(2000);
+
+
   dccexProtocol.setDelegate(&myDelegate);
   dccexProtocol.connect(&client);
   Serial.println("DCC-EX connected");
@@ -254,13 +265,6 @@ void setup()
     throttles[i] = new Throttle(&dccexProtocol);
     throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
   }
-  joinMode = readEEPROMByte(eeJoinMode);
-  wifiSeconds = readEEPROMByte(eeWiFiSeconds);
-  
-  initPage(CoverPage);
-  wait(100);
-  nextionSetText("Version", Version);
-  wait(2000);
 
   activeSlot = readEEPROMByte(eeActiveSlot);
   WiFiEnabled = readEEPROMByte(eeWiFiEnabled);
@@ -271,8 +275,8 @@ void setup()
       readCredentials();
       console.println("Connecting With: ");
       console.println(ssid);
-      console.println(password);
-//      WiFiClient client;
+      console.println("******");
+  //    WiFiClient client;
       retries = readEEPROMByte(eeWiFiRetries);
       if (connectWiFi(retries) == 1)
       {

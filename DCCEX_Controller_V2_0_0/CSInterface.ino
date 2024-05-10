@@ -492,7 +492,7 @@ void updateWiFi()
 void updateNextionThrottle(uint8_t speed)
 {
   encoderPos = speed;
-  nextionSetValue("S", speed);
+//  nextionSetValue("S", speed);
   nextionSetValue("S1", speed);
   nextionSetValue("T", speed);
 }
