@@ -56,13 +56,20 @@ void throttlePage(uint8_t button)
     }
     case ForwardButton:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == 0)
+        if(guestActive == false)
         {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-          dir = 1;
-          changeDir(dir);
+//          dir = 1;
+          activeLoco->setDirection(Direction::Forward);
+          Serial.println("Direction set to Forward");
+          nextionSetValue("FR", 1);
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) activeLoco->setSpeed(0);
+          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+//          changeDir(dir);
         }else{
           guestDir = 1;
           checkThreshold();
@@ -73,13 +80,20 @@ void throttlePage(uint8_t button)
     }
     case ReverseButton:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(guestActive == 0)
+        if(guestActive == false)
         {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-          dir = 0;
-          changeDir(dir);
+//          dir = 0;
+          activeLoco->setDirection(Direction::Reverse);
+          Serial.println("Direction set to Reverse");
+          nextionSetValue("FR", 0);
+          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) activeLoco->setSpeed(0);
+          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+//          changeDir(dir);
         }else{
           guestDir = 0;
           checkThreshold();
@@ -90,17 +104,17 @@ void throttlePage(uint8_t button)
     }
     case SliderEvent:
     {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        wait(20);
+        wait(30);
         int response = nextionGetValue("T");
-//        Serial.print("Response: ");
-//        Serial.println(response);
         if(response != -1)
         {
           encoderPos = response;
-          auto th = throttles[activeSlot];
-          Loco *activeLoco = th->getLoco();
+//          auto th = throttles[activeSlot];
+//          Loco *activeLoco = th->getLoco();
           dccexProtocol.setThrottle(activeLoco, response, activeLoco->getDirection());
         }
       }
@@ -500,7 +514,7 @@ void changeDir(uint8_t dir)
     encoderPos = 0;
     oldEncPos = 0;
   }
-  doDCC(activeSlot);
+  //doDCC(activeSlot);
 }
 /*
  **********************************************************************************************************
