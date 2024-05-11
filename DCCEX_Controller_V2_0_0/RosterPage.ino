@@ -84,16 +84,18 @@ void locosDrawPage(uint8_t startID)
   for(uint8_t r = 0; r < rowsPerNextionLocosPage; r++)
   {
     if (readLocoAddress(startID+r)!=0){
+      nextionSetText("l"+String(r), longLocoNames[startID+r]);
       nextionSetText("a"+String(r), String(readLocoAddress(startID+r)));
       nextionSetText("r"+String(r), String(readLocoRNum(startID+r)));
       nextionSetText("n" + String(r), readEEPROMName(locoNameBase + ((startID+r) * (locoNameLen))));
       nextionSetText("t" + String(r), readEEPROMName(locoTypeBase + ((startID+r) * (locoTypeLen))));
     }else
     {
+      nextionSetText("l"+String(r),"");
       nextionSetText("a"+String(r),"");
       nextionSetText("r"+String(r),"");
       nextionSetText("n"+String(r),"");
-      nextionSetText("t"+String(r),"");
+      nextionSetText("t"+String(r),""); 
     }
   }
   setPageButtons(startID, rowsPerNextionLocosPage, numLocos);

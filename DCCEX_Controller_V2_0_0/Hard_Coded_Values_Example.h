@@ -75,9 +75,10 @@
 	 *  the "Load" button on the Config Page will only populate slots 0, 1, 3, 4, 5, 7, 8, and 9
   */
 
-  #define NUM_HCLOCOS 20
+#define NUM_HCLOCOS 20
 
-  HCLoco hcLocos[NUM_HCLOCOS] = {
+HCLoco hcLocos[NUM_HCLOCOS] = 
+{
   {"Rio Grnd", "SD60-M", 5200, 52, "0",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
   {"NY Cent", "RS3", 7003, 70,  "1",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},  
   {"CN Strip", "H16", 818, 16,  "2",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
@@ -98,6 +99,30 @@
   {"Conrail", "SD60-M", 58, 23,  "17",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
   {"C&P RD", "GP9 TT", 58, 75,  "18",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
   {"Cleaner", "GN BNDY", 58, 54,  "19",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+};
+
+String longLocoNames[20] = 
+{
+  "Rio Grande",
+  "New York Central",
+  "Canadian National Stripes",
+  "Seaboard",
+  "Conrail",
+  "Erie Lake",
+  "Grand National",
+  "Cleaner 1",
+  "New York Central P&LE",
+  "New Haven",
+  "Montana",
+  "North Southern?",
+  "Canadian National BCOL",
+  "Pennsylvania Rail Road",
+  "Grand National",
+  "Burlington Northern Santa Fe",
+  "Union Pacific",
+  "Conrail",
+  "Canadian & Pacific Road",
+  "Cleaner 2"
 };
 /*
  * Hard Coded Values for ACCESSORIES

@@ -25,7 +25,7 @@
   
   #include <EEPROM.h>
   #include <DCCEXProtocol.h>
-  //#include <LittleFS.h>
+  #include <LittleFS.h>
   
   #include "NextionButtons.h"
 
