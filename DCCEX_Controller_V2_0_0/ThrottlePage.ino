@@ -309,9 +309,10 @@ void activateSlot(uint8_t slot)
       dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
     }else
     { 
-      setHeadingDetails(slot);                                             //Update the Page Heading Info
+//      setHeadingDetails(slot);                                             //Update the Page Heading Info
       if(selectedIDs[slot] != 255)
       {
+        nextionSetText("LName", longLocoNames[selectedIDs[slot]]);
         nextionSetText("n" + String(slot), readEEPROMName(locoNameBase + (selectedIDs[slot] * (locoNameLen))));         //Road Name
         nextionSetText("t" + String(slot), readEEPROMName(locoTypeBase + (selectedIDs[slot]* (locoNameLen))));       //Loco Type  
         if(readEEPROMByte(eeRNumEnabled) == 0)
@@ -537,6 +538,7 @@ void changeDir(uint8_t dir)
  * This routine does NOT update the Tab details on the Throttle Page except for the Address...
  **********************************************************************************************************
 */
+/*
 void setHeadingDetails(uint8_t activeSlot)
 {
   if(selectedIDs[activeSlot] != 255)
@@ -552,3 +554,4 @@ void setHeadingDetails(uint8_t activeSlot)
     nextionSetText("Nc", "");
     nextionSetValue("S", 0);
   }}
+*/

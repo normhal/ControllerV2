@@ -38,7 +38,7 @@ void initPage(uint8_t page)
     lastCSPic = 259; 
   }
 #endif
-  setHeadingDetails(activeSlot);
+//  setHeadingDetails(activeSlot);
   switch(page)
   {
     //******************************************************************************************************************************
