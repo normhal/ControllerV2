@@ -166,7 +166,8 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-//      refreshFunctions();
+      Serial.println("Process Functions");
+      loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
     }
 };
 
@@ -252,20 +253,6 @@ void setup()
   nextionSetText("Version", Version);
   wait(2000);
 
-
-  dccexProtocol.setDelegate(&myDelegate);
-  dccexProtocol.connect(&client);
-  Serial.println("DCC-EX connected");
-  for(int i =0; i<numLocoSlots; i++)
-  {
-    Serial.print("Create throttle|loco address: ");
-    Serial.print(i);
-    Serial.print("|");
-    Serial.println(readLocoAddress(selectedIDs[i]));
-    throttles[i] = new Throttle(&dccexProtocol);
-    throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
-  }
-
   activeSlot = readEEPROMByte(eeActiveSlot);
   WiFiEnabled = readEEPROMByte(eeWiFiEnabled);
   #if defined WIFI
@@ -294,7 +281,20 @@ void setup()
     if (readEEPROMByte(eePUState) == 1) powerONButton();    // Set both the Nextion and Command Station Power State
     else powerOFFButton();
   #endif
-
+  
+  dccexProtocol.setDelegate(&myDelegate);
+  dccexProtocol.connect(&client);
+  Serial.println("DCC-EX connected");
+  for(int i =0; i<numLocoSlots; i++)
+  {
+    Serial.print("Create throttle|loco address: ");
+    Serial.print(i);
+    Serial.print("|");
+    Serial.println(readLocoAddress(selectedIDs[i]));
+    throttles[i] = new Throttle(&dccexProtocol);
+    throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
+  }
+  
   initPage(MenuPage);                       //Display the Menu Page first after the Cover Page/
   nextionCommand("bkcmd=0");    //Suppress Error details from the Nextion
 

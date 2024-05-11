@@ -46,7 +46,7 @@
 
   #define HARD_CODED_VALUES       //Uncomment this line to enable the "Load Hard Coded Details" button on the Config Page
 
-  #define HCL_ALL10            //Uses Specific Throttle Slots for Selected Locos
+  #define HCL_ALL10               //Uses Specific Throttle Slots for Selected Locos
 
   #define SHOW_WIFI               //This option shows WiFi commands on the Serial Debug Console for debugging
 
