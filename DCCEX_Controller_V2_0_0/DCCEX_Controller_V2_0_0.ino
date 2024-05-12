@@ -249,7 +249,7 @@ void setup()
   wifiSeconds = readEEPROMByte(eeWiFiSeconds);
   
   initPage(CoverPage);
-  wait(100);
+  wait(250);
   nextionSetText("Version", Version);
   wait(2000);
 
