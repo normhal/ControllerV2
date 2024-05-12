@@ -149,7 +149,7 @@ void throttlePage(uint8_t button)
     {
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
-      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process the Pressed Tab
+      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process a Pressed Tab
       {
         if(guestActive == true)
         {

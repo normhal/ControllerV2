@@ -46,10 +46,10 @@ void locoEditPage(uint8_t button)
     case DeleteButton:
       if(eMode == 1)
       {
-        writeLocoAddress(editingID, 0);
+        writeLocoAddress(editingID, 0);   //Delete the loc by setting its address to 0
         writeLocoRNum(editingID, 0);
         writeEEPROMName(editingID, "");
-        for(uint8_t i=0; i<10; i++)
+        for(uint8_t i=0; i<10; i++)       //Clear all its function assignments
         {
           writeEEPROMByte((locoFuncBase + (editingID*20)) + (i*2), 127);
           writeEEPROMByte((locoFuncBase + (editingID*20)) + ((i*2)+1), BLANK);

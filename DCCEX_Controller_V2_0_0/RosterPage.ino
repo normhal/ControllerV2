@@ -35,6 +35,7 @@ void locosPage(uint8_t button)
     {
       if(readLocoAddress(selectedLocoID) == 0) return; 
       selectedIDs[activeSlot] = selectedLocoID;   //selectedLocoID = Actual LocoID Being worked on
+      throttles[activeSlot]->setLoco(new Loco(readLocoAddress(selectedLocoID), LocoSource::LocoSourceEntry));
       initPage(ThrottlePage);
       break;
     }
@@ -83,19 +84,25 @@ void locosDrawPage(uint8_t startID)
 {
   for(uint8_t r = 0; r < rowsPerNextionLocosPage; r++)
   {
-    if (readLocoAddress(startID+r)!=0){
-      nextionSetText("l"+String(r), longLocoNames[startID+r]);
-      nextionSetText("a"+String(r), String(readLocoAddress(startID+r)));
-      nextionSetText("r"+String(r), String(readLocoRNum(startID+r)));
+    nextionCommand("l" + String(r) + ".bco=50712");
+    nextionCommand("n" + String(r) + ".bco=50712");
+    nextionCommand("t" + String(r) + ".bco=50712");
+    nextionCommand("r" + String(r) + ".bco=50712");
+    nextionCommand("a" + String(r) + ".bco=50712");
+    if (readLocoAddress(startID+r)!=0)
+    {
+      nextionSetText("l" + String(r), longLocoNames[startID+r]);
       nextionSetText("n" + String(r), readEEPROMName(locoNameBase + ((startID+r) * (locoNameLen))));
       nextionSetText("t" + String(r), readEEPROMName(locoTypeBase + ((startID+r) * (locoTypeLen))));
+      nextionSetText("r" + String(r), String(readLocoRNum(startID+r)));
+      nextionSetText("a" + String(r), String(readLocoAddress(startID+r)));
     }else
     {
-      nextionSetText("l"+String(r),"");
-      nextionSetText("a"+String(r),"");
-      nextionSetText("r"+String(r),"");
-      nextionSetText("n"+String(r),"");
-      nextionSetText("t"+String(r),""); 
+      nextionSetText("l" + String(r),"");
+      nextionSetText("n" + String(r),"");
+      nextionSetText("t" + String(r),""); 
+      nextionSetText("r" + String(r),"");
+      nextionSetText("a" + String(r),"");
     }
   }
   setPageButtons(startID, rowsPerNextionLocosPage, numLocos);
