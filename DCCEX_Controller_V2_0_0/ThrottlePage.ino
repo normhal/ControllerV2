@@ -22,6 +22,20 @@
 */
 void throttlePage(uint8_t button)
 {
+  if(message.startsWith("Th"))
+  {
+    Serial.println(message);
+    uint8_t newSpeed = (message.substring(2)).toInt();
+    Serial.printf("New Speed: %d", newSpeed);
+    Serial.println();
+    auto th = throttles[activeSlot];
+    Loco *activeLoco = th->getLoco();
+    if(selectedIDs[activeSlot] != 255)        
+    encoderPos = newSpeed;
+    activeLoco->setSpeed(newSpeed);
+    dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
+    return;
+  }
   switch(button)                  
   {
     case AccButton:
@@ -116,25 +130,10 @@ void throttlePage(uint8_t button)
       }
       break;
     }
-    case SliderEvent:
-    {
-      auto th = throttles[activeSlot];
-      Loco *activeLoco = th->getLoco();
-      if(selectedIDs[activeSlot] != 255)        
-      {
-        wait(30);
-        int response = nextionGetValue("T");
-        if(response != -1)
-        {
-          encoderPos = response;
-          activeLoco->setSpeed(response);
-//          auto th = throttles[activeSlot];
-//          Loco *activeLoco = th->getLoco();
-          dccexProtocol.setThrottle(activeLoco, response, activeLoco->getDirection());
-        }
-      }
-      break;
-    }
+ //   case SliderEvent:
+ //   {
+ //      break;
+ //   }
     case GuestButton:
     {
       nextionDataType = GUEST_ADDRESS;   // Next data expected from the Nextion will be Guest Address 
@@ -178,16 +177,21 @@ void throttlePage(uint8_t button)
           }
           g_fSlot = button - FunctionSlotStart;
           uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
-          if(funcNum == 127) break;
+          uint8_t actualFunc = funcNum & 0x7F;
+          Serial.printf("actualFunc: %d\n\r", actualFunc);
+          if(actualFunc == 127) break;       //Inactive/unassigned function
           uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
-          if(activeLoco->isFunctionOn(funcNum))
+          if(activeLoco->isFunctionOn(actualFunc))
           {
-            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg)));
-            dccexProtocol.functionOff(activeLoco, funcNum);
+            Serial.println("Setting Function Off");
+            nextionCommand(("s" + String(g_fSlot) + ".pic=22"));  // + String(funcImg)));
+            dccexProtocol.functionOff(activeLoco, actualFunc);
           }else
+//          if(activeLoco->isFunctionOff(funcNum))
           {
-            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg+1)));
-            dccexProtocol.functionOn(activeLoco, funcNum);
+            Serial.println("Setting Function On");
+            nextionCommand(("s" + String(g_fSlot) + ".pic=22"));  // + String(funcImg+1)));
+            dccexProtocol.functionOn(activeLoco, actualFunc);
           }
           break;
         }
@@ -198,7 +202,7 @@ void throttlePage(uint8_t button)
           {
             uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
             nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg)));
-            dccexProtocol.functionOff(activeLoco, funcNum);
+            dccexProtocol.functionOff(activeLoco, (funcNum & 0x7f));
           }
         }
         break;
