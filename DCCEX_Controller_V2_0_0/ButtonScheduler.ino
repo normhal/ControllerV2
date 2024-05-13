@@ -148,21 +148,25 @@ void buttonScheduler()
 */
 void stopButton()
 {
+  console.println("STOP Pressed");
   if (readEEPROMByte(eeLocoStopAll) == 1)
   {
     nextionCommand("P2.pic=" + String(CS_W));
     for (uint8_t i = 0; i < numLocoSlots; i++)
     {
-      resumeSpeeds[i] = locos[selectedIDs[i]].speed;
-      locos[selectedIDs[i]].speed = 0;
-      doDCC(i);                                                                           //REVIEW
+//      resumeSpeeds[i] = throttles[i]->getSpeed();     //locos[selectedIDs[i]].speed;
+      console.println(resumeSpeeds[i]);
+      throttles[i]->setSpeed(0);
+//      locos[selectedIDs[i]].speed = 0;
+//      doDCC(i);                                                                           //REVIEW
     }
-    activateSlot(activeSlot);
+//    activateSlot(activeSlot);
   } else {
     resumeSpeeds[activeSlot] = locos[selectedIDs[activeSlot]].speed;
-    locos[selectedIDs[activeSlot]].speed = 0;
-    doDCC(activeSlot);                                                                           //REVIEW
-    activateSlot(activeSlot);
+    throttles[activeSlot]->setSpeed(0);
+//    locos[selectedIDs[activeSlot]].speed = 0;
+//    doDCC(activeSlot);                                                                           //REVIEW
+//    activateSlot(activeSlot);
   }
 }
 /*
@@ -172,18 +176,23 @@ void stopButton()
 */
 void goButton()
 {
+  console.println("GO Pressed");
   if (readEEPROMByte(eeLocoStopAll) == 1)
   {
     nextionCommand("P2.pic=" + String(CS_W));
     for (uint8_t i = 0; i < numLocoSlots; i++)
     {
-      locos[selectedIDs[i]].speed = resumeSpeeds[i];
-      doDCC(i);                                                                           //REVIEW
+      console.println(resumeSpeeds[i]);
+      throttles[i]->setSpeed(resumeSpeeds[i]);
+//      locos[selectedIDs[i]].speed = resumeSpeeds[i];
+//      doDCC(i);                                                                           //REVIEW
     }
     activateSlot(activeSlot);
   } else {
-    locos[selectedIDs[activeSlot]].speed = resumeSpeeds[activeSlot];
-    doDCC(activeSlot);                                                                           //REVIEW
+    throttles[activeSlot]->setSpeed(resumeSpeeds[activeSlot]);
+
+//    locos[selectedIDs[activeSlot]].speed = resumeSpeeds[activeSlot];
+//    doDCC(activeSlot);                                                                           //REVIEW
     activateSlot(activeSlot);
   }
 }

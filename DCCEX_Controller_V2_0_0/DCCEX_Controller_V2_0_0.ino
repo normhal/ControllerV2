@@ -147,16 +147,12 @@ class MyDelegate : public DCCEXProtocolDelegate
     }
     void receivedLocoUpdate(Loco* activeLoco) 
     {
- //     Serial.print("Received Loco update for DCC address: ");
- //     Serial.println(activeLoco->getAddress());
 
       nextionSetText("AD", String(activeLoco->getAddress()));
-//      Serial.print("Speed and Direction set to: ");
-//      Serial.print(activeLoco->getSpeed());
-//      Serial.print(" Direction: ");
-//      Serial.println(activeLoco->getDirection());
       wait(20);
       nextionSetValue("S1", activeLoco->getSpeed());
+      resumeSpeeds[activeSlot] = activeLoco->getSpeed();
+      console.println(activeLoco->getSpeed());
       wait(20);
       nextionSetValue("T", activeLoco->getSpeed());
       if(activeLoco->getDirection() == Forward)
@@ -166,7 +162,6 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-//      Serial.println("Process Functions");
       loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
     }
 };
@@ -203,7 +198,7 @@ private:
 // define our activeLoco object
 Loco* activeLoco = nullptr;
 
-WiFiClient client;
+//WiFiClient client;
 /*
 **************************************************************************************
 * DCCEXProtocol goodies
@@ -249,24 +244,21 @@ void setup()
   wifiSeconds = readEEPROMByte(eeWiFiSeconds);
   
   initPage(CoverPage);
-  wait(500);
-  Serial.printf("Setting Version: %S\n\r", Version);
-  nextionSetText("H", "Boo!");
-  nextionSetText("V", String(Version));
-  wait(2000);
 
   activeSlot = readEEPROMByte(eeActiveSlot);
   WiFiEnabled = readEEPROMByte(eeWiFiEnabled);
+  
   #if defined WIFI
     if(WiFiEnabled == 1)
     {
+      initPage(WiFiPage);
       console.println("WiFi is Enabled");
       readCredentials();
-      console.println("Connecting With: ");
-      console.println(ssid);
-      console.println("******");
-  //    WiFiClient client;
+//      console.println("Connecting With: ");
+//      console.println(ssid);
+//      console.println("******");
       retries = readEEPROMByte(eeWiFiRetries);
+      WiFiClient client;
       if (connectWiFi(retries) == 1)
       {
         int i=0;
@@ -279,11 +271,15 @@ void setup()
       wait(100);
     }
   #endif
+  
   #if defined SEND_POWER_STATE
     if (readEEPROMByte(eePUState) == 1) powerONButton();    // Set both the Nextion and Command Station Power State
     else powerOFFButton();
   #endif
-  
+
+  nextionSetText("V", String(Version));
+  wait(3000);
+
   dccexProtocol.setDelegate(&myDelegate);
   dccexProtocol.connect(&client);
   Serial.println("DCC-EX connected");
@@ -295,8 +291,9 @@ void setup()
     Serial.println(readLocoAddress(selectedIDs[i]));
     throttles[i] = new Throttle(&dccexProtocol);
     throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
+    resumeSpeeds[i]=0;
   }
-  
+  wait(50);
   initPage(MenuPage);                       //Display the Menu Page first after the Cover Page/
   nextionCommand("bkcmd=0");    //Suppress Error details from the Nextion
 
