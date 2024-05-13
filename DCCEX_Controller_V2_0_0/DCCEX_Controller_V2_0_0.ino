@@ -147,14 +147,14 @@ class MyDelegate : public DCCEXProtocolDelegate
     }
     void receivedLocoUpdate(Loco* activeLoco) 
     {
-      Serial.print("Received Loco update for DCC address: ");
-      Serial.println(activeLoco->getAddress());
+ //     Serial.print("Received Loco update for DCC address: ");
+ //     Serial.println(activeLoco->getAddress());
 
       nextionSetText("AD", String(activeLoco->getAddress()));
-      Serial.print("Speed and Direction set to: ");
-      Serial.print(activeLoco->getSpeed());
-      Serial.print(" Direction: ");
-      Serial.println(activeLoco->getDirection());
+//      Serial.print("Speed and Direction set to: ");
+//      Serial.print(activeLoco->getSpeed());
+//      Serial.print(" Direction: ");
+//      Serial.println(activeLoco->getDirection());
       wait(20);
       nextionSetValue("S1", activeLoco->getSpeed());
       wait(20);
@@ -166,7 +166,7 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-      Serial.println("Process Functions");
+//      Serial.println("Process Functions");
       loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
     }
 };
@@ -249,8 +249,10 @@ void setup()
   wifiSeconds = readEEPROMByte(eeWiFiSeconds);
   
   initPage(CoverPage);
-  wait(250);
-  nextionSetText("Version", Version);
+  wait(500);
+  Serial.printf("Setting Version: %S\n\r", Version);
+  nextionSetText("H", "Boo!");
+  nextionSetText("V", String(Version));
   wait(2000);
 
   activeSlot = readEEPROMByte(eeActiveSlot);
