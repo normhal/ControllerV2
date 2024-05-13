@@ -21,8 +21,8 @@
   #include "ImageDefs.h"
   #include "TFTList.h"
 
-  #if __has_include ("Credentials.h")
-    #include "Credentials.h"
+  #if __has_include (<Credentials.h>)
+    #include <Credentials.h>
   #else
     #warning Credentials.h not found. Using defaults from Credentials_Example.h
     #include "Credentials_Example.h"
@@ -31,6 +31,8 @@
   //#define DCCPP                   //Un-comment for DCC++ else DCCEX
 
   #define ENABLE_OTA
+
+  #define RNUM_ENABLED ON         //Enables Road Number (ON) or Address (OFF) on Throttle Tabs
 
   #define NEXTION_UPLOAD          //Enables support for remote updating of Nextion HMI (not supported on Pico yet)
 

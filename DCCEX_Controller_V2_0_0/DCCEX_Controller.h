@@ -19,7 +19,7 @@
 #ifndef DCCEXCONTROLLER_H
   #define DCCEXCONTROLLER_H
 
-  #define Version "V2.0.0"
+  #define Version "V2.0.1"
   uint8_t EEPROMCODE = 200;
   String TFT_SUFFIX = ".tft";
   
@@ -255,6 +255,7 @@
   void getValue(String);
   void nextionUpload(uint8_t);
   void loadHardCodedValues();
+  void setupSelected();
   void saveSelected();
   void restoreSelected();
   void selectionPage(uint8_t);

@@ -24,10 +24,10 @@ void throttlePage(uint8_t button)
 {
   if(message.startsWith("Th"))
   {
-    Serial.println(message);
+//    Serial.println(message);
     uint8_t newSpeed = (message.substring(2)).toInt();
-    Serial.printf("New Speed: %d", newSpeed);
-    Serial.println();
+//    Serial.printf("New Speed: %d", newSpeed);
+//    Serial.println();
     auto th = throttles[activeSlot];
     Loco *activeLoco = th->getLoco();
     if(selectedIDs[activeSlot] != 255)        
@@ -149,7 +149,7 @@ void throttlePage(uint8_t button)
     {
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
-      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process a Pressed Tab
+      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process the Pressed Tab
       {
         if(guestActive == true)
         {
