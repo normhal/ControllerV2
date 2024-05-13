@@ -59,7 +59,7 @@
 
     #if defined WIFI
       #include <WiFi.h>
-//      WiFiClient client;
+      WiFiClient client;
     #endif
 
     #define REButtonPin 13        // The GPIO Pin number for the encoder reverse button

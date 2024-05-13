@@ -35,7 +35,6 @@
 uint8_t connectWiFi(uint8_t retries)
 {
   #if defined WIFI
-    initPage(WiFiPage);                         //Switch Nextion to Status Page
     if(WiFiEnabled != 1) 
     {
       console.println("WiFi not Enabled so continuing...");
