@@ -24,10 +24,7 @@ void throttlePage(uint8_t button)
 {
   if(message.startsWith("Th"))
   {
-    Serial.println(message);
     uint8_t newSpeed = (message.substring(2)).toInt();
-    Serial.printf("New Speed: %d", newSpeed);
-    Serial.println();
     auto th = throttles[activeSlot];
     Loco *activeLoco = th->getLoco();
     if(selectedIDs[activeSlot] != 255)        
@@ -79,12 +76,12 @@ void throttlePage(uint8_t button)
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 1;
           activeLoco->setDirection(Direction::Forward);
-          Serial.println("Direction set to Forward");
+//          Serial.println("Direction set to Forward");
           nextionSetValue("FR", 1);
-          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
-          Serial.println();
-          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
-          Serial.println();
+//          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+//          Serial.println();
+//          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+//          Serial.println();
           if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
           {
             activeLoco->setSpeed(0);
@@ -110,12 +107,12 @@ void throttlePage(uint8_t button)
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 0;
           activeLoco->setDirection(Direction::Reverse);
-          Serial.println("Direction set to Reverse");
-          Serial.println();
-          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
-          Serial.println();
+//          Serial.println("Direction set to Reverse");
+//          Serial.println();
+//          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
+//          Serial.println();
           nextionSetValue("FR", 0);
-          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
+//          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
           if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
           {
             activeLoco->setSpeed(0);
@@ -149,7 +146,7 @@ void throttlePage(uint8_t button)
     {
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
-      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process a Pressed Tab
+      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process the Pressed Tab
       {
         if(guestActive == true)
         {
@@ -178,19 +175,19 @@ void throttlePage(uint8_t button)
           g_fSlot = button - FunctionSlotStart;
           uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
           uint8_t actualFunc = funcNum & 0x7F;
-          Serial.printf("actualFunc: %d\n\r", actualFunc);
+//          Serial.printf("actualFunc: %d\n\r", actualFunc);
           if(actualFunc == 127) break;       //Inactive/unassigned function
           uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
           if(activeLoco->isFunctionOn(actualFunc))
           {
-            Serial.println("Setting Function Off");
-            nextionCommand(("s" + String(g_fSlot) + ".pic=22"));  // + String(funcImg)));
+//            Serial.println("Setting Function Off");
+            nextionCommand(("s" + String(g_fSlot) + ".pic=49"));  // + String(funcImg)));
             dccexProtocol.functionOff(activeLoco, actualFunc);
           }else
 //          if(activeLoco->isFunctionOff(funcNum))
           {
-            Serial.println("Setting Function On");
-            nextionCommand(("s" + String(g_fSlot) + ".pic=22"));  // + String(funcImg+1)));
+//            Serial.println("Setting Function On");
+            nextionCommand(("s" + String(g_fSlot) + ".pic=49"));  // + String(funcImg+1)));
             dccexProtocol.functionOn(activeLoco, actualFunc);
           }
           break;

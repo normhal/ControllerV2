@@ -45,8 +45,8 @@ void buttonScheduler()
     if(client.connected()) nextionCommand("P2.pic=258"); else nextionCommand("P2.pic=259");
 #endif
     button = message.toInt();
-    Serial.printf("Button Value: %d", button);
-    Serial.println();
+ //   Serial.printf("Button Value: %d", button);
+ //   Serial.println();
     switch (button)
     {
       case StopButton:

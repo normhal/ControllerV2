@@ -255,6 +255,7 @@
   void getValue(String);
   void nextionUpload(uint8_t);
   void loadHardCodedValues();
+  void setupSelected();
   void saveSelected();
   void restoreSelected();
   void selectionPage(uint8_t);

@@ -162,6 +162,8 @@ void initEEPROM()
 //    j++;
   }
   writeEEPROMByte(eeJoinMode, JOIN_OPTION);
+  writeEEPROMByte(eeRNumEnabled, RNUM_ENABLED);
+  writeEEPROMByte(eeWiFiRetries, WiFiRetries);
   writeEEPROMByte(eeActiveSlot, activeSlot);
   writeEEPROMByte(eeThreshold, ReverseThreshold);
   writeEEPROMByte(eeREIncrement, REAccAmount);
@@ -189,7 +191,8 @@ void initEEPROM()
   for(int i = accImageBase; i < (routeListBase); i++) writeEEPROMByte(i, BLANK);
 
   saveCredentials();
-  
+  setupSelected();
+
   writeEEPROMByte(eepromEnd, EEPROMCODE);   //Indicate that EEPROM has now been initialized
 }
 /*
@@ -397,6 +400,22 @@ void writeEEPROMAddr(uint16_t eeAddress, uint16_t wordToWrite)
 }
 /*
  ***********************************************************************************************************************************
+ * Initialize Selected IDS as 0 to 9 and Active Loco Slot to 0
+ ***********************************************************************************************************************************
+*/
+void setupSelected()
+{
+  uint8_t c = 0;
+  for (uint16_t s = eeSelIDs; s < (eeSelIDs+numLocoSlots); s++)
+  {
+    writeEEPROMByte(s, c);
+    c++;
+  }
+  writeEEPROMByte(eeActiveSlot,0);
+  if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
+}
+/*
+ ***********************************************************************************************************************************
  * Save Selected IDS and Active Loco 
  ***********************************************************************************************************************************
 */
@@ -413,7 +432,7 @@ void saveSelected()
 }
 /*
  ***********************************************************************************************************************************
- * Save Selected IDS and Active Loco 
+ * Restore Selected IDS and Active Loco 
  ***********************************************************************************************************************************
 */
 void restoreSelected()
