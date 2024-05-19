@@ -34,6 +34,20 @@ void throttlePage(uint8_t button)
     resumeSpeeds[activeSlot] = newSpeed;
     return;
   }
+  if(message.startsWith("GL"))          //Guest Loco
+  {
+    Serial.print("Guest Loco Requested: ");
+    uint16_t guestAddr = (message.substring(2)).toInt();
+    Serial.println(guestAddr);
+    auto th = throttles[numLocoSlots+1];
+    Loco *activeLoco = th->getLoco();
+    throttles[numLocoSlots+1] = new Throttle(&dccexProtocol);
+    throttles[numLocoSlots+1]->setLoco(new Loco(guestAddr, LocoSource::LocoSourceEntry));
+    nextionSetText("LName", "Guest Loco");
+    nextionCommand("AD.bco=" + String(YELLOW));
+    guestActive = true;
+    return;
+  }
   switch(button)                  
   {
     case AccButton:
@@ -72,28 +86,23 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-//        if(guestActive == false)
-//        {
+        if(guestActive == false)
+        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 1;
           activeLoco->setDirection(Direction::Forward);
-//          Serial.println("Direction set to Forward");
           nextionSetValue("FR", 1);
-//          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
-//          Serial.println();
-//          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
-//          Serial.println();
           if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
           {
             activeLoco->setSpeed(0);
             nextionSetValue("S1",0);
           }
           dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-//        }else{
-//          guestDir = 1;
+        }else{
+          guestDir = 1;
 //          checkThreshold();
 //          setGuest();
-//        }
+        }
       }
       break;
     }
@@ -103,15 +112,11 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-//        if(guestActive == false)
-//        {
+        if(guestActive == false)
+        {
           if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
 //          dir = 0;
           activeLoco->setDirection(Direction::Reverse);
-//          Serial.println("Direction set to Reverse");
-//          Serial.println();
-//          Serial.printf("Speed Value: %d", activeLoco->getSpeed());
-//          Serial.println();
           nextionSetValue("FR", 0);
 //          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
           if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
@@ -120,11 +125,11 @@ void throttlePage(uint8_t button)
             nextionSetValue("S1",0);
           }
           dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-//        }else{
-//          guestDir = 0;
+        }else{
+          guestDir = 0;
 //          checkThreshold();
 //          setGuest();
-//       }
+        }
       }
       break;
     }

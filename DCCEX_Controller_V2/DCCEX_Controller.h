@@ -19,13 +19,13 @@
 #ifndef DCCEXCONTROLLER_H
   #define DCCEXCONTROLLER_H
 
-  #define Version "V2.0.1"
+  #define Version "V2.0.2"
   uint8_t EEPROMCODE = 200;
   String TFT_SUFFIX = ".tft";
   
   #include <EEPROM.h>
   #include <DCCEXProtocol.h>
-  #include <LittleFS.h>
+  //#include <LittleFS.h>
   
   #include "NextionButtons.h"
 

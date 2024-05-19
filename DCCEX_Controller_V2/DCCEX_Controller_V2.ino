@@ -206,7 +206,7 @@ Loco* activeLoco = nullptr;
 */
 DCCEXProtocol dccexProtocol;
 MyDelegate myDelegate;
-Throttle *throttles[numLocoSlots];
+Throttle *throttles[numLocoSlots+1];
 
 /*
 **************************************************************************************************************************
@@ -283,7 +283,7 @@ void setup()
   dccexProtocol.setDelegate(&myDelegate);
   dccexProtocol.connect(&client);
   Serial.println("DCC-EX connected");
-  for(int i =0; i<numLocoSlots; i++)
+  for(int i =0; i<(numLocoSlots); i++)
   {
     Serial.print("Create throttle|loco address: ");
     Serial.print(i);
@@ -293,6 +293,9 @@ void setup()
     throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
     resumeSpeeds[i]=0;
   }
+  throttles[numLocoSlots] = new Throttle(&dccexProtocol);                         //Create the Guest Throttle
+  throttles[numLocoSlots]->setLoco(new Loco(0, LocoSource::LocoSourceEntry));
+  
   wait(50);
   initPage(MenuPage);                       //Display the Menu Page first after the Cover Page/
   nextionCommand("bkcmd=0");    //Suppress Error details from the Nextion
