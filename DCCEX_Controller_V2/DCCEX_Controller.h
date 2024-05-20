@@ -250,7 +250,7 @@
   void initFunctions();
 
   String nextionReceive();
-  void setGuest();
+  //void setGuest();
   void nextionGetText(String);
   void getValue(String);
   void nextionUpload(uint8_t);
@@ -779,5 +779,6 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   uint8_t wifiSeconds = WIFISECS;
   long int wifiTimer = 0;
   long int wifiTimeout = 0;
+  uint8_t savedSlot = 0;
 
 #endif

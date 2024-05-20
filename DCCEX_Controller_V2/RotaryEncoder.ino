@@ -31,7 +31,7 @@ void updateSpeed()
       doDCC(activeSlot);
     }else{
       updateNextionThrottle(encoderPos);
-      setGuest();
+      //setGuest();
     }
   }
 }
@@ -94,7 +94,7 @@ void checkREButton()
           encoderPos = 0;
           updateNextionThrottle(encoderPos);
         }
-        setGuest();
+        //setGuest();
       }
     }
   }

@@ -147,7 +147,7 @@ class MyDelegate : public DCCEXProtocolDelegate
     }
     void receivedLocoUpdate(Loco* activeLoco) 
     {
-
+      nextionCommand("P2.pic=258");                             //CS has replied
       nextionSetText("AD", String(activeLoco->getAddress()));
       wait(20);
       nextionSetValue("S1", activeLoco->getSpeed());
@@ -162,7 +162,7 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-      loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
+      if(guestActive == false) loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
     }
 };
 

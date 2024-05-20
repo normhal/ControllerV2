@@ -22,10 +22,10 @@
 */
 void initPage(uint8_t page)
 {
+  auto th = throttles[activeSlot];
+  Loco *activeLoco = th->getLoco();
+  
   activatePage(page);
-//  if(!PowerState) nextionSetValue("Power",0);
-//  if(PowerState)  nextionSetValue("Power",1);
-//  wait(50);
   nextionCommand(("Sig.pic=" + String(wifiImage)).c_str());
 #if defined WIFI
   if(client.connected())
@@ -44,7 +44,6 @@ void initPage(uint8_t page)
     //******************************************************************************************************************************
     case ThrottlePage:
     {  
-    //  wait(50);
       populateSlots();
       activateSlot(activeSlot);
       break;
