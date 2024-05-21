@@ -27,18 +27,6 @@ void initPage(uint8_t page)
   
   activatePage(page);
   nextionCommand(("Sig.pic=" + String(wifiImage)).c_str());
-#if defined WIFI
-  if(client.connected())
-  {
-    nextionCommand("P2.pic=258");
-    lastCSPic = 258; 
-  }else
-  {
-    nextionCommand("P2.pic=259");
-    lastCSPic = 259; 
-  }
-#endif
-//  setHeadingDetails(activeSlot);
   switch(page)
   {
     //******************************************************************************************************************************
@@ -54,13 +42,14 @@ void initPage(uint8_t page)
       nextionSetText("AD", String(readLocoAddress(editingID)));
       if(readLocoAddress(editingID) == 0)
       {
-        nextionSetText("Na","");
-        nextionSetText("Nb","");
+        nextionSetText("RN","");
+        nextionSetText("LT","");
       }else{
-        nextionSetText("Na", readEEPROMName(locoNameBase + (editingID * (locoNameLen))));      //Get Loco Name from Integrated EEPROM
-        nextionSetText("Nb", readEEPROMName(locoTypeBase + (editingID * (locoTypeLen))));      //Get Loco Type from Integrated EEPROM
+        nextionSetText("RN", readEEPROMName(locoNameBase + (editingID * (locoNameLen))));      //Get Loco Name from Integrated EEPROM
+        nextionSetText("LT", readEEPROMName(locoTypeBase + (editingID * (locoTypeLen))));      //Get Loco Type from Integrated EEPROM
       }
-      nextionSetText("RNum", String(readLocoRNum(editingID)));
+      nextionSetText("FName", longLocoNames[selectedIDs[editingID]]);
+      nextionSetText("LN", String(readLocoRNum(editingID)));
       loadFunctions(LocoEditPage, editingID);
       break;
     }

@@ -232,6 +232,7 @@ void setup()
   #endif
 
   enum List listName;
+  //enum IDs NextionIDs;
   
   EEPROM.begin(eepromSize);                 
   if (EEPROM.read(eepromEnd) != EEPROMCODE) initEEPROM();       //Test to see if EEPROM has been initialized before
@@ -255,9 +256,6 @@ void setup()
       initPage(WiFiPage);
       console.println("WiFi is Enabled");
       readCredentials();
-//      console.println("Connecting With: ");
-//      console.println(ssid);
-//      console.println("******");
       retries = readEEPROMByte(eeWiFiRetries);
       WiFiClient client;
       if (connectWiFi(retries) == 1)
@@ -337,9 +335,6 @@ void loop()
   #if defined ENABLE_ROTARY_ENCODER
     checkREButton();                      // check for change in direction from Rotary Encoder
   #endif
-//  updateSpeed();                        // check for speed change
-//  receiveCMD();                         // Receive and Process anything from the Command Station
-//  refreshDCC();                         // Refresh current Loco if enabled
   dccexProtocol.check();
   buttonScheduler();                    // Process any received Nextion data
   throttles[activeSlot]->process();

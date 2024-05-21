@@ -155,7 +155,37 @@
     TFTs,
     IPs
   };
-
+/*
+  enum IDs
+  {
+    AD = 1,
+    TH,
+    GL,
+    FN,
+    RN,
+    LT,
+    C2,
+    C6,
+    C5,
+    C3,
+    C4,
+    CN,
+    CV,
+    N0,
+    N1,
+    N2,
+    N3,
+    SS,
+    PA,
+    IP,
+    PO,
+    RC,
+    AA,
+    AN,
+    FF,
+    TN
+  };
+*/
   void buttonScheduler();
   void goButton();
   void stopButton();
