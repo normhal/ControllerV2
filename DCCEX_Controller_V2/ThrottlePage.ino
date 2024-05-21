@@ -22,16 +22,27 @@
 */
 void throttlePage(uint8_t button)
 {
-  if(message.startsWith("Th"))
+  if(message.startsWith("TH"))
   {
     uint8_t newSpeed = (message.substring(2)).toInt();
-    auto th = throttles[activeSlot];
-    Loco *activeLoco = th->getLoco();
-    if(selectedIDs[activeSlot] != 255)        
-    encoderPos = newSpeed;
-    activeLoco->setSpeed(newSpeed);
-    dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
-    resumeSpeeds[activeSlot] = newSpeed;
+    if(guestActive == false)
+    {
+      auto th = throttles[activeSlot];
+      Loco *activeLoco = th->getLoco();
+      if(selectedIDs[activeSlot] != 255) encoderPos = newSpeed;
+      activeLoco->setSpeed(newSpeed);
+      nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
+      dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
+      resumeSpeeds[activeSlot] = newSpeed;
+    }else //Guest IS Active
+    {
+      auto th = throttles[numLocoSlots];
+      Loco *activeLoco = th->getLoco();
+      encoderPos = newSpeed;
+      activeLoco->setSpeed(newSpeed);
+      nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
+      dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
+    }
     return;
   }
   if(message.startsWith("GL"))          //Guest Loco
@@ -39,124 +50,113 @@ void throttlePage(uint8_t button)
     Serial.print("Guest Loco Requested: ");
     uint16_t guestAddr = (message.substring(2)).toInt();
     Serial.println(guestAddr);
-    auto th = throttles[numLocoSlots+1];
+    auto th = throttles[numLocoSlots];        //open Throttle 11
     Loco *activeLoco = th->getLoco();
-    throttles[numLocoSlots+1] = new Throttle(&dccexProtocol);
-    throttles[numLocoSlots+1]->setLoco(new Loco(guestAddr, LocoSource::LocoSourceEntry));
+    throttles[numLocoSlots] = new Throttle(&dccexProtocol);
+    throttles[numLocoSlots]->setLoco(new Loco(guestAddr, LocoSource::LocoSourceEntry));
     nextionSetText("LName", "Guest Loco");
-    nextionCommand("AD.bco=" + String(YELLOW));
+    nextionCommand("LName.bco=" + String(YELLOW));
     guestActive = true;
     return;
   }
   switch(button)                  
   {
     case AccButton:
-      nextionCommand("AD.bco=" + String(GREY));
-      guestActive = false;        
-      AccReturnPage = ThrottlePage;
-      initPage(AccPage);
+      if(guestActive == false)
+      {
+//        nextionCommand("LName.bco=" + String(GREY));
+        AccReturnPage = ThrottlePage;
+        initPage(AccPage);
+      }
       break;
     case LocosButton:
-      nextionCommand("AD.bco=" + String(GREY));
-      guestActive = false;        
-      LocosReturnPage = ThrottlePage;
-      initPage(LocosPage);
+      if(guestActive == false)
+      {
+//        nextionCommand("LName.bco=" + String(GREY));
+        LocosReturnPage = ThrottlePage;
+        initPage(LocosPage);
+      }
       break;
     case ProgramButton:
-      nextionCommand("AD.bco=" + String(GREY));
-      guestActive = false;  
-      ProgReturnPage = ThrottlePage;      
-      initPage(ProgramPage);
+      if(guestActive == false)
+      {
+//        nextionCommand("LName.bco=" + String(GREY));
+        ProgReturnPage = ThrottlePage;      
+        initPage(ProgramPage);
+      }
       break;
     case EditButtonOn:                          //This is Actually the "Address" text
     {
-      if(selectedIDs[activeSlot] != 255)        
+      if(guestActive == false)                //Edit not available for Guest Loco
       {
-        nextionCommand("AD.bco=" + String(GREY));
-        guestActive = false;
-        editingID = selectedIDs[activeSlot];
-        LocoEditReturnPage = ThrottlePage;
-        initPage(LocoEditPage);
+        if(selectedIDs[activeSlot] != 255)        
+        {
+//          nextionCommand("LName.bco=" + String(GREY));
+          editingID = selectedIDs[activeSlot];
+          LocoEditReturnPage = ThrottlePage;
+          initPage(LocoEditPage);
+        }
       }
       break;
     }
     case ForwardButton:
     {
-      auto th = throttles[activeSlot];
-      Loco *activeLoco = th->getLoco();
-      if(selectedIDs[activeSlot] != 255)        
-      {
-        if(guestActive == false)
+      uint8_t currentSlot;
+      if(guestActive == false) currentSlot = activeSlot;
+      else currentSlot = numLocoSlots;
+      if(selectedIDs[currentSlot] != 255)
+      {        
+        auto th = throttles[currentSlot];
+        Loco *activeLoco = th->getLoco();
+//          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
+        activeLoco->setDirection(Direction::Forward);
+        nextionSetValue("FR", 1);
+        if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
         {
-          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-//          dir = 1;
-          activeLoco->setDirection(Direction::Forward);
-          nextionSetValue("FR", 1);
-          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
-          {
-            activeLoco->setSpeed(0);
-            nextionSetValue("S1",0);
-          }
-          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-        }else{
-          guestDir = 1;
-//          checkThreshold();
-//          setGuest();
+          activeLoco->setSpeed(0);
+          nextionSetValue("S1",0);
         }
+        nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
+        dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
       }
+      if(guestActive == false) activeSlot = currentSlot;    //restore Active Slot value
       break;
     }
     case ReverseButton:
     {
-      auto th = throttles[activeSlot];
-      Loco *activeLoco = th->getLoco();
-      if(selectedIDs[activeSlot] != 255)        
-      {
-        if(guestActive == false)
+      uint8_t currentSlot;
+      if(guestActive == false) currentSlot = activeSlot;
+      else currentSlot = numLocoSlots;
+      if(selectedIDs[currentSlot] != 255)
+      {        
+        auto th = throttles[currentSlot];
+        Loco *activeLoco = th->getLoco();
+//          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
+        activeLoco->setDirection(Direction::Reverse);
+        nextionSetValue("FR", 0);
+        if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
         {
-          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
-//          dir = 0;
-          activeLoco->setDirection(Direction::Reverse);
-          nextionSetValue("FR", 0);
-//          Serial.printf("Threshold Value: %d", readEEPROMByte(eeThreshold));
-          if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
-          {
-            activeLoco->setSpeed(0);
-            nextionSetValue("S1",0);
-          }
-          dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
-        }else{
-          guestDir = 0;
-//          checkThreshold();
-//          setGuest();
+          activeLoco->setSpeed(0);
+          nextionSetValue("S1",0);
         }
+        nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
+        dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
       }
-      break;
-    }
- //   case SliderEvent:
- //   {
- //      break;
- //   }
-    case GuestButton:
-    {
-      nextionDataType = GUEST_ADDRESS;   // Next data expected from the Nextion will be Guest Address 
-      nextionSetText("Na","Guest");
-      nextionSetText("Nb","Loco");
-      nextionSetText("Nc","");
-      nextionCommand("AD.bco=" + String(YELLOW));
-      guestActive = true;
-      encoderPos = 0;
+      if(guestActive == false) activeSlot = currentSlot;    //restore Active Slot value
       break;
     }
     default:                                                  
     {
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
-      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      //Process the Pressed Tab
+//
+//Process the Pressed Tab
+//
+      if((button >= TabSlotStart) && (button < (TabSlotStart + locosPerPage)))      
       {
         if(guestActive == true)
         {
-          nextionCommand("AD.bco=" + String(GREY));
+          nextionCommand("LName.bco=" + String(GREY));
           guestActive = false;
           initPage(ThrottlePage);
           break;
@@ -173,7 +173,7 @@ void throttlePage(uint8_t button)
         {
           if(guestActive == true)
           {
-            nextionCommand("AD.bco=" + String(GREY));
+            nextionCommand("LName.bco=" + String(GREY));
             guestActive = false;
             initPage(ThrottlePage);
             break;
@@ -181,19 +181,15 @@ void throttlePage(uint8_t button)
           g_fSlot = button - FunctionSlotStart;
           uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
           uint8_t actualFunc = funcNum & 0x7F;
-//          Serial.printf("actualFunc: %d\n\r", actualFunc);
           if(actualFunc == 127) break;       //Inactive/unassigned function
           uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
           if(activeLoco->isFunctionOn(actualFunc))
           {
-//            Serial.println("Setting Function Off");
-            nextionCommand(("s" + String(g_fSlot) + ".pic=49"));  // + String(funcImg)));
+            nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
             dccexProtocol.functionOff(activeLoco, actualFunc);
           }else
-//          if(activeLoco->isFunctionOff(funcNum))
           {
-//            Serial.println("Setting Function On");
-            nextionCommand(("s" + String(g_fSlot) + ".pic=49"));  // + String(funcImg+1)));
+            nextionCommand(("P2.pic=260"));  // + String(funcImg+1)));  //Waiting for CS
             dccexProtocol.functionOn(activeLoco, actualFunc);
           }
           break;
@@ -218,11 +214,11 @@ void throttlePage(uint8_t button)
  * Send the New Guest Speed to the Command Station
  ****************************************************************************************************************
 */
-void setGuest()
-{
-  String dccppCMD = "<t 0 " + String(guestAddress) + " " + String(encoderPos) + " " + String(guestDir) + ">"; 
-  sendCMD(dccppCMD);
-}
+//void setGuest()
+//{
+//  String dccppCMD = "<t 0 " + String(guestAddress) + " " + String(encoderPos) + " " + String(guestDir) + ">"; 
+//  sendCMD(dccppCMD);
+//}
 /*
  ***************************************************************************************************************
  * Reset Speed to 0 if above Threshold
@@ -242,37 +238,48 @@ void populateSlots()
 {  
   for(uint8_t i = 0; i <numLocoSlots ; i++)
   {
-    if(i != activeSlot)
+    if(guestActive == false)
     {
-      if(selectedIDs[i] != 255)
+      if(i != activeSlot)
       {
-        nextionSetText("n" + String(i),"");                                                                                   //Blank out if unused
-        nextionSetText("t" + String(i), readEEPROMName(locoTypeBase + (selectedIDs[i]* (locoNameLen))));                      //Loco Type
-        nextionSetText("n" + String(i), readEEPROMName(locoNameBase + (selectedIDs[i] * (locoNameLen))));                     //Road Name
-        if((readLocoAddress(selectedIDs[i])) == 0)
+        if(selectedIDs[i] != 255)
         {
+          Serial.printf("SelectedID %d\n\r", selectedIDs[i]);
+          nextionSetText("n" + String(i),"");                                                                                   //Blank out if unused
+          nextionSetText("t" + String(i), readEEPROMName(locoTypeBase + (selectedIDs[i]* (locoNameLen))));                      //Loco Type
+          nextionSetText("n" + String(i), readEEPROMName(locoNameBase + (selectedIDs[i] * (locoNameLen))));                     //Road Name
+          if((readLocoAddress(selectedIDs[i])) == 0)
+          {
+            Serial.printf("6. Active Slot: %d\n\r", activeSlot);
+            nextionSetText("v" + String(i),"");
+            nextionSetText("t" + String(i),"");
+            nextionSetText("n" + String(i),"");
+          }else //locoAddress != 0
+          {
+            if(readEEPROMByte(eeRNumEnabled) == 0)
+            {
+              nextionSetText("v" + String(i), String(readLocoAddress(selectedIDs[i])));
+            }else //Road Number NOT enabled
+            {
+              nextionSetText("v" + String(i), String(readLocoRNum(selectedIDs[i])));
+            }
+            nextionCommand("v" + String(i) + ".pco=" + String(WHITE));
+          }
+        }else //selectedID == 255 
+        {
+          Serial.printf("3. Active Slot: %d\n\r", activeSlot);
           nextionSetText("v" + String(i),"");
           nextionSetText("t" + String(i),"");
           nextionSetText("n" + String(i),"");
-        }else
-        {
-          if(readEEPROMByte(eeRNumEnabled) == 0)
-          {
-            nextionSetText("v" + String(i), String(readLocoAddress(selectedIDs[i])));
-          }else
-          {
-            nextionSetText("v" + String(i), String(readLocoRNum(selectedIDs[i])));
-          }
-          nextionCommand("v" + String(i) + ".pco=" + String(WHITE));
         }
-      }else
-      {
-        nextionSetText("v" + String(i),"");
-        nextionSetText("t" + String(i),"");
-        nextionSetText("n" + String(i),"");
-      }
+      } //end of inactive SLot
+    }else //Guest IS active
+    {
+      nextionSetText("v" + String(i),"");
+      nextionSetText("t" + String(i),"");
+      nextionSetText("n" + String(i),"");
     }
-  }
+  }   //Next i
 }
 /*
  ***************************************************************************************************************
@@ -281,6 +288,7 @@ void populateSlots()
 */
 void activateSlot(uint8_t slot)
 {
+  Serial.printf("4. Active Slot: %d\n\r", slot);
   if(nextionPage == ThrottlePage)
   {
     #if defined DISPLAY_TAB_DETAILS_GREY_BG
@@ -316,10 +324,11 @@ void activateSlot(uint8_t slot)
       dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
     }else
     { 
-//      setHeadingDetails(slot);                                             //Update the Page Heading Info
       if(selectedIDs[slot] != 255)
       {
+        Serial.printf("5. Active Slot: %d\n\r", activeSlot);
         nextionSetText("LName", longLocoNames[selectedIDs[slot]]);
+        wait(50);
         nextionSetText("n" + String(slot), readEEPROMName(locoNameBase + (selectedIDs[slot] * (locoNameLen))));         //Road Name
         nextionSetText("t" + String(slot), readEEPROMName(locoTypeBase + (selectedIDs[slot]* (locoNameLen))));       //Loco Type  
         if(readEEPROMByte(eeRNumEnabled) == 0)

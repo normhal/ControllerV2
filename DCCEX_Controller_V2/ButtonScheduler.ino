@@ -41,9 +41,11 @@ void buttonScheduler()
       nextionGetText(message.substring(3));
       return;
     }
+/*
 #if defined WIFI
     if(client.connected()) nextionCommand("P2.pic=258"); else nextionCommand("P2.pic=259");
 #endif
+*/
     button = message.toInt();
     switch (button)
     {

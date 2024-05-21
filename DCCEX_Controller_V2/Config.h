@@ -21,8 +21,8 @@
   #include "ImageDefs.h"
   #include "TFTList.h"
 
-  #if __has_include (<Credentials.h>)
-    #include <Credentials.h>
+  #if __has_include ("Credentials.h")
+    #include "Credentials.h"
   #else
     #warning Credentials.h not found. Using defaults from Credentials_Example.h
     #include "Credentials_Example.h"

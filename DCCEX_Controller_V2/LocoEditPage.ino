@@ -26,6 +26,32 @@
 */
 void locoEditPage(uint8_t button)
 {
+  String receivedID = message.substring(2);
+  if(message.startsWith("FN"))
+  {
+    longLocoNames[selectedIDs[editingID]] = receivedID;
+    return;
+  }
+  if(message.startsWith("AD"))
+  {
+    writeLocoAddress(editingID, receivedID.toInt());
+    return;
+  }
+  if(message.startsWith("RN"))
+  {
+    writeEEPROMName((locoNameBase + (editingID * (locoNameLen))), receivedID);
+    return;
+  }
+  if(message.startsWith("LT"))
+  {
+    writeEEPROMName((locoTypeBase + (editingID * (locoTypeLen))), receivedID);
+    return;
+  }
+    if(message.startsWith("LN"))
+  {
+    writeLocoRNum(editingID, receivedID.toInt()); 
+    return;
+  }
   switch(button)
   {
     case Cancel_Press:
@@ -86,7 +112,7 @@ void locoEditPage(uint8_t button)
       eMode = 0;
       break;
     }
-    
+/*    
     case AD_Press:
       nextionDataType = LOCO_ADDRESS;
       break;
@@ -99,6 +125,7 @@ void locoEditPage(uint8_t button)
     case Nc_Press:
       nextionDataType = ROAD_NUMBER;
       break;
+*/
     default:
     {
       if(button >= SlotAStart && button < (SlotAStart + functionsPerPage))        //This comes from the IMAGE Slot which was pressed (200 to 209)

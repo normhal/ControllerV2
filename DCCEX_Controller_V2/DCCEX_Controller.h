@@ -155,7 +155,37 @@
     TFTs,
     IPs
   };
-
+/*
+  enum IDs
+  {
+    AD = 1,
+    TH,
+    GL,
+    FN,
+    RN,
+    LT,
+    C2,
+    C6,
+    C5,
+    C3,
+    C4,
+    CN,
+    CV,
+    N0,
+    N1,
+    N2,
+    N3,
+    SS,
+    PA,
+    IP,
+    PO,
+    RC,
+    AA,
+    AN,
+    FF,
+    TN
+  };
+*/
   void buttonScheduler();
   void goButton();
   void stopButton();
@@ -250,7 +280,7 @@
   void initFunctions();
 
   String nextionReceive();
-  void setGuest();
+  //void setGuest();
   void nextionGetText(String);
   void getValue(String);
   void nextionUpload(uint8_t);
@@ -779,5 +809,6 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   uint8_t wifiSeconds = WIFISECS;
   long int wifiTimer = 0;
   long int wifiTimeout = 0;
+  uint8_t savedSlot = 0;
 
 #endif

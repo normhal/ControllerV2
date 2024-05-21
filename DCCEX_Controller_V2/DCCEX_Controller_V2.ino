@@ -47,6 +47,9 @@
     V1.6a - 19 March - bugfix
     - Disabled WiFi Status check when WiFi disabled - limit unnecessary data sent out console/Direct Connection
     - Limited refresh of Throttle Page fields to Throttle Page only (prevent field corruption on WiFi Status Page)
+    V2.0.0
+    - Details to follow...
+    
 *****************************************************************************************************************
 
 Getting Started
@@ -125,7 +128,7 @@ class MyDelegate : public DCCEXProtocolDelegate
   public:
     void receivedServerVersion(int major, int minor, int patch) 
     {     
-      Serial.print("\n\nReceived version: ");
+      Serial.print("\nReceived version: ");
       Serial.print(major);
       Serial.print(".");
       Serial.print(minor);
@@ -134,9 +137,9 @@ class MyDelegate : public DCCEXProtocolDelegate
     }
     void receivedTrackPower(TrackPower state) 
     { 
-      Serial.print("\n\nReceived Track Power: ");
+      Serial.print("\nReceived Track Power: ");
       Serial.println(state);  
-      Serial.println("\n\n"); 
+      Serial.println("\n"); 
       if(state) nextionCommand("POWER.pic=4");    //Indicate Power ON
       else nextionCommand("Power.pic=5");
     }
@@ -147,12 +150,10 @@ class MyDelegate : public DCCEXProtocolDelegate
     }
     void receivedLocoUpdate(Loco* activeLoco) 
     {
-
+      nextionCommand("P2.pic=258");                             //CS has replied
       nextionSetText("AD", String(activeLoco->getAddress()));
       wait(20);
       nextionSetValue("S1", activeLoco->getSpeed());
-//      resumeSpeeds[activeSlot] = activeLoco->getSpeed();
-//      console.println(activeLoco->getSpeed());
       wait(20);
       nextionSetValue("T", activeLoco->getSpeed());
       if(activeLoco->getDirection() == Forward)
@@ -162,7 +163,7 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-      loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
+      if(guestActive == false) loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
     }
 };
 
@@ -231,6 +232,7 @@ void setup()
   #endif
 
   enum List listName;
+  //enum IDs NextionIDs;
   
   EEPROM.begin(eepromSize);                 
   if (EEPROM.read(eepromEnd) != EEPROMCODE) initEEPROM();       //Test to see if EEPROM has been initialized before
@@ -254,9 +256,6 @@ void setup()
       initPage(WiFiPage);
       console.println("WiFi is Enabled");
       readCredentials();
-//      console.println("Connecting With: ");
-//      console.println(ssid);
-//      console.println("******");
       retries = readEEPROMByte(eeWiFiRetries);
       WiFiClient client;
       if (connectWiFi(retries) == 1)
@@ -336,9 +335,6 @@ void loop()
   #if defined ENABLE_ROTARY_ENCODER
     checkREButton();                      // check for change in direction from Rotary Encoder
   #endif
-//  updateSpeed();                        // check for speed change
-//  receiveCMD();                         // Receive and Process anything from the Command Station
-//  refreshDCC();                         // Refresh current Loco if enabled
   dccexProtocol.check();
   buttonScheduler();                    // Process any received Nextion data
   throttles[activeSlot]->process();

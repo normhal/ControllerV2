@@ -376,9 +376,7 @@ void doDCCAcc(uint8_t accID)      //Send DCC Accessory command
 {
   String dccppCMD = "";
   dccppCMD = ("<a " + String(readAccAddress(accID)) + " " + String(accStates[accID]) + ">");
-//  nextionCommand("P2.pic=258");
   sendCMD(dccppCMD);
-//  nextionCommand("P2.pic=258");
 /*
 #if defined WIFI
   if(client.connected()) nextionCommand("P2.pic=258"); else nextionCommand("P2.pic=259");
