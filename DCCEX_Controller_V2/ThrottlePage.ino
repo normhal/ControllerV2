@@ -22,16 +22,15 @@
 */
 void throttlePage(uint8_t button)
 {
-  if(message.startsWith("Th"))
+  if(message.startsWith("TH"))
   {
     uint8_t newSpeed = (message.substring(2)).toInt();
     auto th = throttles[activeSlot];
     Loco *activeLoco = th->getLoco();
-    if(selectedIDs[activeSlot] != 255)        
-    encoderPos = newSpeed;
+    if(selectedIDs[activeSlot] != 255) encoderPos = newSpeed;
     activeLoco->setSpeed(newSpeed);
     dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
-    resumeSpeeds[activeSlot] = newSpeed;
+    if(guestActive == false) resumeSpeeds[activeSlot] = newSpeed;
     return;
   }
   if(message.startsWith("GL"))          //Guest Loco
@@ -54,7 +53,7 @@ void throttlePage(uint8_t button)
   {
     case AccButton:
       nextionCommand("AD.bco=" + String(GREY));
-      if(guestActive)
+      if(guestActive == true)
       {
         activeSlot = savedSlot;
         guestActive = false;
@@ -64,7 +63,7 @@ void throttlePage(uint8_t button)
       break;
     case LocosButton:
       nextionCommand("AD.bco=" + String(GREY));
-      if(guestActive)
+      if(guestActive == true)
       {
         activeSlot = savedSlot;
         guestActive = false;
@@ -74,7 +73,7 @@ void throttlePage(uint8_t button)
       break;
     case ProgramButton:
       nextionCommand("AD.bco=" + String(GREY));
-      if(guestActive)
+      if(guestActive == true)
       {
         activeSlot = savedSlot;
         guestActive = false;
@@ -86,7 +85,7 @@ void throttlePage(uint8_t button)
     {
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(!guestActive)
+        if(guestActive == false)                //Edit not available for Guest Loco
         {
           nextionCommand("AD.bco=" + String(GREY));
           editingID = selectedIDs[activeSlot];
@@ -98,6 +97,7 @@ void throttlePage(uint8_t button)
     }
     case ForwardButton:
     {
+      Serial.printf("7. Active Slot: %d\n", activeSlot);
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
@@ -116,11 +116,16 @@ void throttlePage(uint8_t button)
     }
     case ReverseButton:
     {
+      Serial.printf("7. Active Slot: %d\n", activeSlot);
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255)        
       {
-        if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
+        if(guestActive == false)
+        {
+          if(readLocoAddress(selectedIDs[activeSlot]) == 0) 
+          return;
+        }
         activeLoco->setDirection(Direction::Reverse);
         nextionSetValue("FR", 0);
         if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
@@ -134,6 +139,7 @@ void throttlePage(uint8_t button)
     }
     default:                                                  
     {
+      Serial.printf("8. Active Slot: %d\n\r", activeSlot);
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
 //
@@ -146,6 +152,7 @@ void throttlePage(uint8_t button)
           nextionCommand("AD.bco=" + String(GREY));
           guestActive = false;
           activeSlot = savedSlot;
+          Serial.printf("Selected ID 0 = %d\n\r", selectedIDs[0]);
           initPage(ThrottlePage);
           break;
         }
@@ -233,6 +240,7 @@ void populateSlots()
 //    {
       if(selectedIDs[i] != 255)
       {
+        Serial.printf("SelectedID %d\n\r", selectedIDs[i]);
         nextionSetText("n" + String(i),"");                                                                                   //Blank out if unused
         nextionSetText("t" + String(i), readEEPROMName(locoTypeBase + (selectedIDs[i]* (locoNameLen))));                      //Loco Type
         nextionSetText("n" + String(i), readEEPROMName(locoNameBase + (selectedIDs[i] * (locoNameLen))));                     //Road Name
