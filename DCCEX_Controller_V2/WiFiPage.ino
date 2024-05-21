@@ -23,71 +23,85 @@
 void wifiPage(uint8_t button)
 {
 #if defined WIFI
+  if(message.startsWith("SS"))
+  { 
+    WiFiEnabled = 0;
+    writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
+    writeEEPROMName(eeSSID, message.substring(2));
+    ssid = message.substring(2);
+    updateWiFi();
+    return;
+  }
+  if(message.startsWith("PA"))
+  {
+    WiFiEnabled = 0;
+    writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
+    writeEEPROMName(eePWD, message.substring(2));
+    password = message.substring(2);
+    return;
+  }
+  if(message.startsWith("IP"))
+  {
+    WiFiEnabled = 0;
+    writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
+    writeEEPROMName(eeIPAddr, message.substring(2));
+    host = message.substring(2);
+    return;
+  }
+  if(message.startsWith("PO"))
+  {
+    WiFiEnabled = 0;
+    writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
+    writeEEPROMAddr(eePort, message.substring(2).toInt());
+    port = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("RC"))
+  {
+    writeEEPROMByte(eeWiFiRetries, message.substring(2).toInt());
+    retries = message.substring(2).toInt(); 
+    return;
+  }
   switch (button)
   {
     case ConfigButton:
-        if(!EEPROM.commit()) console.println("EEPROM.commit Failed"); 
-        initPage(ConfigPage);
-        break;
-      case Done_Press:
-        saveCredentials();
-        if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
-        initPage(MenuPage);
-        break;
-      case Scan_Press:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
-        nextionSetValue("WiFi",0);
-        listName = SSIDs;
-        returnPage = WiFiPage;
-        initPage(SelectionPage);
-        break;
-      case  RetryButton:
-        WiFiEnabled = 1;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
-        
-        nextionSetText("Progress", "Retrying...");
-        if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
-        updateWiFi();
-        break;
-      case WiFiEnabledON:
-        WiFiEnabled = 1;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
-        nextionSetText("Progress", "Enabling WiFi...");
-        updateWiFi();
-        break;
-      case WiFiEnabledOFF:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
-        nextionSetText("Progress", "Disabling WiFi...");
-        updateWiFi();
-        break;
-      case SSID_Press:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
-        nextionDataType = SSID_NAME;
-        updateWiFi();
-        break;
-      case PW_Press:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
-        nextionDataType = SSID_PASSWORD;
-        break;
-      case IP_Press:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
-        nextionDataType = HOST_IP_ADDRESS;
-        break;
-      case Port_Press:
-        WiFiEnabled = 0;
-        writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
-        nextionDataType = PORT_NUMBER;
-        break;
-      case Retries_Press:
-        nextionDataType = WIFI_RETRIES;
-        break;
-      default:
-        break;
+      if(!EEPROM.commit()) console.println("EEPROM.commit Failed"); 
+      initPage(ConfigPage);
+      break;
+    case Done_Press:
+      saveCredentials();
+      if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
+      initPage(MenuPage);
+      break;
+    case Scan_Press:
+      WiFiEnabled = 0;
+      writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
+      nextionSetValue("WiFi",0);
+      listName = SSIDs;
+      returnPage = WiFiPage;
+      initPage(SelectionPage);
+      break;
+    case  RetryButton:
+      WiFiEnabled = 1;
+      writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
+      nextionSetText("Progress", "Retrying...");
+      if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
+      updateWiFi();
+      break;
+    case WiFiEnabledON:
+      WiFiEnabled = 1;
+      writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);
+      nextionSetText("Progress", "Enabling WiFi...");
+      updateWiFi();
+      break;
+    case WiFiEnabledOFF:
+      WiFiEnabled = 0;
+      writeEEPROMByte(eeWiFiEnabled, WiFiEnabled);                //WiFi default
+      nextionSetText("Progress", "Disabling WiFi...");
+      updateWiFi();
+      break;
+    default:
+      break;
     }
   #endif
 }

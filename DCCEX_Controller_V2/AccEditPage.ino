@@ -29,6 +29,21 @@
 */
 void accEditPage(uint8_t button)
 {
+  if(message.startsWith("AA"))
+  {
+    writeAccAddress(editingID, message.substring(2).toInt());                       //and the Address
+    return;
+  }
+  if(message.startsWith("AI"))
+  {
+    writeEEPROMByte(accImageBase + (editingID), message.substring(2).toInt());                //and its Image
+    return;
+  }
+  if(message.startsWith("AN"))
+  {
+    writeEEPROMName((accNameBase + (editingID * (accNameLen))), message.substring(2));
+    return;
+  }
   switch(button)
   {
     case Done_Press:
@@ -40,15 +55,6 @@ void accEditPage(uint8_t button)
     }
     case Cancel_Press:
       initPage(AccPage);
-      break;
-    case Image_Selected:
-      nextionDataType = ACC_IMAGE;
-      break;
-    case Acc_AD_Press:
-      nextionDataType = ACC_ADDRESS;
-      break;
-    case Acc_N_Press:
-      nextionDataType = ACC_NAME;
       break;
     case DCCButton:
       break;

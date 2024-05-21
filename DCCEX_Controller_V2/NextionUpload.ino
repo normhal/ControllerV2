@@ -33,6 +33,31 @@ void nextionUpload(uint8_t button)
 {
   #if defined WIFI  && defined NEXTION_UPLOAD
     updated = false;
+    if(message.startsWith("SS"))
+    {
+      ussid = message.substring(2);
+      return;
+    }
+    if(message.startsWith("PA"))
+    {
+      upassword = message.substring(2);
+      return;
+    }
+    if(message.startsWith("IP"))
+    {
+      tftHost = message.substring(2);
+      return;
+    }
+    if(message.startsWith("PO"))
+    {
+      tftPort = message.substring(2).toInt();
+      return;
+    }
+    if(message.startsWith("TN"))
+    {
+      url = ('/' + message.substring(2));
+      return;
+    }
     switch(button)
     {
       case Cancel_Press:
@@ -57,21 +82,6 @@ void nextionUpload(uint8_t button)
         returnPage = UpdatePage;
         button=0;                   //make sure previous button value is invalid
         initPage(SelectionPage);
-        break;
-      case uSSIDButton:
-        nextionDataType = U_SSID;
-        break;
-      case uPWButton:
-        nextionDataType = U_PW;
-        break;
-      case TFTIPButton:
-        nextionDataType = TFT_IP;
-        break;
-      case TFTPortButton:
-        nextionDataType = TFT_PORT;
-        break;
-      case TFTNameButton:
-        nextionDataType = TFT_NAME;
         break;
       case UploadButtonOn:
       {

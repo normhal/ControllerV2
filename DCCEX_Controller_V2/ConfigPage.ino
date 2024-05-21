@@ -23,6 +23,23 @@
 */
 void configPage(uint8_t button)
 {
+  if(message.startsWith("N0"))
+  {
+    writeEEPROMByte(eeThreshold, message.substring(2).toInt());
+  }
+  if(message.startsWith("N1"))
+  {
+    writeEEPROMByte(eeREIncrement, message.substring(2).toInt());
+  }
+  if(message.startsWith("N2"))
+  {
+    writeEEPROMByte(eeAccDelay, message.substring(2).toInt());
+  }
+  if(message.startsWith("N3"))
+  {
+    writeEEPROMByte(eeWiFiSeconds, message.substring(2).toInt());
+    wifiSeconds = message.substring(2).toInt();
+  }
   switch (button)
   {
     case WiFiButton:
