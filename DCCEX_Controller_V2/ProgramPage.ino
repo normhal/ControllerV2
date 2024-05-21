@@ -32,6 +32,46 @@
 */
 void programPage(uint8_t button)
 {
+  if(message.startsWith("AD"))
+  {
+    g_programAddress = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("CN"))
+  {
+    cv_Num = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("CV"))
+  {
+    cv_Value = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("C2"))
+  {
+    cv2_Value = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("C3"))
+  {    
+    cv3_Value = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("C4"))
+  {    
+    cv4_Value = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("C5"))
+  {
+    cv5_Value = message.substring(2).toInt();
+    return;
+  }
+  if(message.startsWith("C6"))
+  {    
+    cv6_Value = message.substring(2).toInt();
+    return;
+  }
   switch (button)
   {
     case Done_Press:
@@ -102,61 +142,30 @@ void programPage(uint8_t button)
       nextionSetText("S3", "Press CV Heading to Program");
       break;
     }
-//The Following cases handle presses of Nextion Value Fields
-    case Program_AD_Press:
-      nextionDataType = PROGRAM_ADDRESS;
-      break;
-    case CVNVal_Press:
-      nextionDataType = CV_NUMBER;
-      break;
-    case CVVVal_Press:
-      nextionDataType = CV_VALUE;
-      break;
-    case MinVal_Press:
-      nextionDataType = CV2_VALUE;
-      break;
-    case MidVal_Press:
-      nextionDataType = CV6_VALUE;
-      break;
-    case MaxVal_Press:
-      nextionDataType = CV5_VALUE;
-      break;
-    case AccelVal_Press:
-      nextionDataType = CV3_VALUE;
-      break;
-    case DecelVal_Press:
-      nextionDataType = CV4_VALUE;
-      break;
 // The following cases handle Touch activated Text Fields     
     case CVnText_Press:
       if(progType == progRead) readCV(cv_Num);
       else writeCV(cv_Num, cv_Value);
-      nextionDataType = CV_VALUE;     
       break;
     case MinText_Press:
       if(progType == progRead) readCV(CV2);
       else writeCV(CV2, cv2_Value);
-      nextionDataType = CV2_VALUE;
       break;
     case MidText_Press:
       if(progType == progRead) readCV(CV6);
       else writeCV(CV6, cv6_Value);
-      nextionDataType = CV6_VALUE;
       break;
     case MaxText_Press:
       if(progType == progRead) readCV(CV5);
       else writeCV(CV5, cv5_Value);
-      nextionDataType = CV5_VALUE;
       break;
     case AccelText_Press:
       if(progType == progRead) readCV(CV3);
       else writeCV(CV3, cv3_Value);
-      nextionDataType = CV3_VALUE;
       break;
     case DecelText_Press:
       if(progType == progRead) readCV(CV4);
       else writeCV(CV4, cv4_Value);
-      nextionDataType = CV4_VALUE;
       break;
     default:
       break;

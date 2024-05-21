@@ -22,6 +22,16 @@
 */
 void functionEditPage(uint8_t button)
 {
+  if(message.startsWith("FN"))
+  {
+    writeEEPROMByte((locoFuncBase + (editingID * 20)) + (g_fSlot*2), message.substring(2).toInt());
+    return;
+  }  
+  if(message.startsWith("FI"))
+  {
+    writeEEPROMByte((locoFuncBase + (editingID * 20)) + ((g_fSlot*2)+1), message.substring(2).toInt());
+    return;
+  }
   switch(button)
   {
     case Done_Press:
@@ -42,12 +52,6 @@ void functionEditPage(uint8_t button)
       initPage(LocoEditPage);
       break;
     }
-    case Func_Num_Press:
-      nextionDataType = FUNC_NUMBER;
-      break;
-    case Func_Image_Press:
-      nextionDataType = FUNC_IMAGE;
-      break;
     case Func_Latched:
     {
       uint8_t funcNumber = readEEPROMByte((locoFuncBase + (editingID * 20)) + (g_fSlot*2));
