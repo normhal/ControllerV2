@@ -134,6 +134,7 @@ class MyDelegate : public DCCEXProtocolDelegate
       Serial.print(minor);
       Serial.print(".");
       Serial.println(patch);
+      nextionCommand("P2.pic=258");                             //CS has replied
     }
     void receivedTrackPower(TrackPower state) 
     { 
@@ -142,11 +143,13 @@ class MyDelegate : public DCCEXProtocolDelegate
       Serial.println("\n"); 
       if(state) nextionCommand("POWER.pic=4");    //Indicate Power ON
       else nextionCommand("Power.pic=5");
+      nextionCommand("P2.pic=258");                             //CS has replied
     }
     void receivedMessage(char *message)
     {
       Serial.print("Received Message: ");
       Serial.println(message);  
+      nextionCommand("P2.pic=258");                             //CS has replied
     }
     void receivedLocoUpdate(Loco* activeLoco) 
     {

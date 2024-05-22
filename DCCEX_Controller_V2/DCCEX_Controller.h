@@ -19,7 +19,7 @@
 #ifndef DCCEXCONTROLLER_H
   #define DCCEXCONTROLLER_H
 
-  #define Version "V2.0.3"
+  #define Version "V2.0.4"
   uint8_t EEPROMCODE = 200;
   String TFT_SUFFIX = ".tft";
   
