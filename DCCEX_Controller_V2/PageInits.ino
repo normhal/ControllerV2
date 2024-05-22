@@ -109,9 +109,11 @@ void initPage(uint8_t page)
       nextionSetValue("Read", 0);
       nextionSetValue("Write", 0);
       nextionCommand("ADText.pco=" + String(GREY));
+      nextionCommand("LName.pco=" + String(GREY));
       nextionCommand("AD.pco=" + String(GREY));
       nextionCommand("AD.bco=" + String(GREY));
       nextionSetText("AD", String(readLocoAddress(selectedIDs[activeSlot])));
+      nextionSetText("LName", String(longLocoNames[selectedIDs[activeSlot]]));
       nextionSetText("CVN", "");
       nextionSetText("CVV", "");
       nextionSetText("S0", "Select Main or Prog First");

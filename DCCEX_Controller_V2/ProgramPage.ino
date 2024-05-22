@@ -94,6 +94,7 @@ void programPage(uint8_t button)
       progType = progWrite;
       nextionSetText("S0", "Enter Loco or Acc Address");
       nextionCommand("ADText.pco=" + String(BLACK));
+      nextionCommand("LName.pco=" + String(BLACK));
       nextionCommand("AD.pco=" + String(BLACK));
       nextionSetValue("Read", 0);
       nextionSetValue("Write", 1);

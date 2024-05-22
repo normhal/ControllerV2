@@ -31,8 +31,8 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       if(selectedIDs[activeSlot] != 255) encoderPos = newSpeed;
       activeLoco->setSpeed(newSpeed);
-      nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
       dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
+      nextionCommand("P2.pic=260");                                       //Waiting for CS
       resumeSpeeds[activeSlot] = newSpeed;
     }else //Guest IS Active
     {
@@ -40,8 +40,8 @@ void throttlePage(uint8_t button)
       Loco *activeLoco = th->getLoco();
       encoderPos = newSpeed;
       activeLoco->setSpeed(newSpeed);
-      nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
       dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
+      nextionCommand("P2.pic=260");                                       //Waiting for CS
     }
     return;
   }
@@ -64,7 +64,6 @@ void throttlePage(uint8_t button)
     case AccButton:
       if(guestActive == false)
       {
-//        nextionCommand("LName.bco=" + String(GREY));
         AccReturnPage = ThrottlePage;
         initPage(AccPage);
       }
@@ -72,7 +71,6 @@ void throttlePage(uint8_t button)
     case LocosButton:
       if(guestActive == false)
       {
-//        nextionCommand("LName.bco=" + String(GREY));
         LocosReturnPage = ThrottlePage;
         initPage(LocosPage);
       }
@@ -80,7 +78,6 @@ void throttlePage(uint8_t button)
     case ProgramButton:
       if(guestActive == false)
       {
-//        nextionCommand("LName.bco=" + String(GREY));
         ProgReturnPage = ThrottlePage;      
         initPage(ProgramPage);
       }
@@ -91,7 +88,6 @@ void throttlePage(uint8_t button)
       {
         if(selectedIDs[activeSlot] != 255)        
         {
-//          nextionCommand("LName.bco=" + String(GREY));
           editingID = selectedIDs[activeSlot];
           LocoEditReturnPage = ThrottlePage;
           initPage(LocoEditPage);
@@ -116,8 +112,8 @@ void throttlePage(uint8_t button)
           activeLoco->setSpeed(0);
           nextionSetValue("S1",0);
         }
-        nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
         dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+        nextionCommand("P2.pic=260");                                                     //Waiting for CS
       }
       if(guestActive == false) activeSlot = currentSlot;    //restore Active Slot value
       break;
@@ -139,8 +135,8 @@ void throttlePage(uint8_t button)
           activeLoco->setSpeed(0);
           nextionSetValue("S1",0);
         }
-        nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
         dccexProtocol.setThrottle(activeLoco, activeLoco->getSpeed(), activeLoco->getDirection());
+        nextionCommand("P2.pic=260");                                                     //Waiting for CS
       }
       if(guestActive == false) activeSlot = currentSlot;    //restore Active Slot value
       break;
@@ -185,12 +181,12 @@ void throttlePage(uint8_t button)
           uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
           if(activeLoco->isFunctionOn(actualFunc))
           {
-            nextionCommand(("P2.pic=260"));  // + String(funcImg)));    //Waiting for CS
             dccexProtocol.functionOff(activeLoco, actualFunc);
+            nextionCommand("P2.pic=260");                                       //Waiting for CS
           }else
           {
-            nextionCommand(("P2.pic=260"));  // + String(funcImg+1)));  //Waiting for CS
             dccexProtocol.functionOn(activeLoco, actualFunc);
+            nextionCommand("P2.pic=260");                                       //Waiting for CS
           }
           break;
         }
@@ -200,8 +196,8 @@ void throttlePage(uint8_t button)
           if((funcNum & 0x80) != 0)     //fType == PULSE)
           {
             uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
-            nextionCommand(("s" + String(g_fSlot) + ".pic=" + String(funcImg)));
             dccexProtocol.functionOff(activeLoco, (funcNum & 0x7f));
+            nextionCommand("P2.pic=260");                                   //Waiting for CS
           }
         }
         break;
@@ -209,16 +205,6 @@ void throttlePage(uint8_t button)
     }
   }
 }
-/*
- ***************************************************************************************************************
- * Send the New Guest Speed to the Command Station
- ****************************************************************************************************************
-*/
-//void setGuest()
-//{
-//  String dccppCMD = "<t 0 " + String(guestAddress) + " " + String(encoderPos) + " " + String(guestDir) + ">"; 
-//  sendCMD(dccppCMD);
-//}
 /*
  ***************************************************************************************************************
  * Reset Speed to 0 if above Threshold
@@ -288,7 +274,6 @@ void populateSlots()
 */
 void activateSlot(uint8_t slot)
 {
-  Serial.printf("4. Active Slot: %d\n\r", slot);
   if(nextionPage == ThrottlePage)
   {
     #if defined DISPLAY_TAB_DETAILS_GREY_BG
@@ -322,6 +307,7 @@ void activateSlot(uint8_t slot)
       auto th = throttles[activeSlot];
       Loco *loco = th->getLoco();
       dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
+//      nextionCommand("P2.pic=260");                                       //Waiting for CS
     }else
     { 
       if(selectedIDs[slot] != 255)
@@ -341,6 +327,7 @@ void activateSlot(uint8_t slot)
         auto th = throttles[activeSlot];
         Loco *loco = th->getLoco();
         dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
+//        nextionCommand("P2.pic=260");                                       //Waiting for CS
         updateNextionThrottle(loco->getSpeed());
         nextionSetValue(F("FR"), (loco->getDirection()));
         nextionSetText("AD", String(loco->getAddress()));
@@ -548,26 +535,3 @@ void changeDir(uint8_t dir)
   }
   //doDCC(activeSlot);
 }
-/*
- **********************************************************************************************************
- * Set Loco Details at the top of each Page
- * This routine does NOT update the Tab details on the Throttle Page except for the Address...
- **********************************************************************************************************
-*/
-/*
-void setHeadingDetails(uint8_t activeSlot)
-{
-  if(selectedIDs[activeSlot] != 255)
-  {
-    nextionSetText("Na", readEEPROMName(locoNameBase + (selectedIDs[activeSlot] * (locoNameLen))));
-    nextionSetText("Nb", readEEPROMName(locoTypeBase + (selectedIDs[activeSlot] * (locoTypeLen))));
-    nextionSetText("Nc", String(readLocoRNum(selectedIDs[activeSlot])));
-    nextionSetValue("S", locos[selectedIDs[activeSlot]].speed);
-  }else
-  {
-    nextionSetText("Na", "");
-    nextionSetText("Nb", "");
-    nextionSetText("Nc", "");
-    nextionSetValue("S", 0);
-  }}
-*/
