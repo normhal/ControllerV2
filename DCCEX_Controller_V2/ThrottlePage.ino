@@ -22,6 +22,7 @@
 */
 void throttlePage(uint8_t button)
 {
+  Serial.printf("Throttle Page: %d\n\r", thNum);
   if(message.startsWith("TH"))
   {
     uint8_t newSpeed = (message.substring(2)).toInt();
@@ -29,7 +30,7 @@ void throttlePage(uint8_t button)
     {
       auto th = throttles[activeSlot];
       Loco *activeLoco = th->getLoco();
-      if(selectedIDs[activeSlot] != 255) encoderPos = newSpeed;
+      if(selectedIDs[thNum][activeSlot] != 255) encoderPos = newSpeed;
       activeLoco->setSpeed(newSpeed);
       dccexProtocol.setThrottle(activeLoco, newSpeed, activeLoco->getDirection());
       nextionCommand("P2.pic=260");                                       //Waiting for CS
@@ -86,9 +87,9 @@ void throttlePage(uint8_t button)
     {
       if(guestActive == false)                //Edit not available for Guest Loco
       {
-        if(selectedIDs[activeSlot] != 255)        
+        if(selectedIDs[thNum][activeSlot] != 255)        
         {
-          editingID = selectedIDs[activeSlot];
+          editingID = selectedIDs[thNum][activeSlot];
           LocoEditReturnPage = ThrottlePage;
           initPage(LocoEditPage);
         }
@@ -100,11 +101,11 @@ void throttlePage(uint8_t button)
       uint8_t currentSlot;
       if(guestActive == false) currentSlot = activeSlot;
       else currentSlot = numLocoSlots;
-      if(selectedIDs[currentSlot] != 255)
+      if(selectedIDs[thNum][currentSlot] != 255)
       {        
         auto th = throttles[currentSlot];
         Loco *activeLoco = th->getLoco();
-//          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
+//          if(readLocoAddress(selectedIDs[thNum][activeSlot]) == 0) return;
         activeLoco->setDirection(Direction::Forward);
         nextionSetValue("FR", 1);
         if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
@@ -123,11 +124,11 @@ void throttlePage(uint8_t button)
       uint8_t currentSlot;
       if(guestActive == false) currentSlot = activeSlot;
       else currentSlot = numLocoSlots;
-      if(selectedIDs[currentSlot] != 255)
+      if(selectedIDs[thNum][currentSlot] != 255)
       {        
         auto th = throttles[currentSlot];
         Loco *activeLoco = th->getLoco();
-//          if(readLocoAddress(selectedIDs[activeSlot]) == 0) return;
+//          if(readLocoAddress(selectedIDs[thNum][activeSlot]) == 0) return;
         activeLoco->setDirection(Direction::Reverse);
         nextionSetValue("FR", 0);
         if(activeLoco->getSpeed() >= readEEPROMByte(eeThreshold)) 
@@ -163,7 +164,7 @@ void throttlePage(uint8_t button)
         activateSlot(activeSlot);
         break;
       }
-      if(selectedIDs[activeSlot] != 255)        
+      if(selectedIDs[thNum][activeSlot] != 255)        
       {
         if(button >= FunctionSlotStart && button < (FunctionSlotStart + functionsPerPage))         //Process the Function Slots
         {
@@ -175,10 +176,10 @@ void throttlePage(uint8_t button)
             break;
           }
           g_fSlot = button - FunctionSlotStart;
-          uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
+          uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[thNum][activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
           uint8_t actualFunc = funcNum & 0x7F;
           if(actualFunc == 127) break;       //Inactive/unassigned function
-          uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
+          uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[thNum][activeSlot]*fBlockSize) +(g_fSlot*2)+1);
           if(activeLoco->isFunctionOn(actualFunc))
           {
             dccexProtocol.functionOff(activeLoco, actualFunc);
@@ -192,10 +193,10 @@ void throttlePage(uint8_t button)
         }
         if(button >= FunctionReleaseStart && button < (FunctionReleaseStart + functionsPerPage))
         {
-          uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
+          uint8_t funcNum = readEEPROMByte(locoFuncBase + (selectedIDs[thNum][activeSlot]*fBlockSize) +(g_fSlot*2));    //retrieve the actual function number from its EEPROM slot
           if((funcNum & 0x80) != 0)     //fType == PULSE)
           {
-            uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[activeSlot]*fBlockSize) +(g_fSlot*2)+1);
+            uint8_t funcImg = readEEPROMByte(locoFuncBase + (selectedIDs[thNum][activeSlot]*fBlockSize) +(g_fSlot*2)+1);
             dccexProtocol.functionOff(activeLoco, (funcNum & 0x7f));
             nextionCommand("P2.pic=260");                                   //Waiting for CS
           }
@@ -226,17 +227,16 @@ void populateSlots()
   {
     if(guestActive == false)
     {
-      if(i != activeSlot)
-      {
-        if(selectedIDs[i] != 255)
+//      if(i != activeSlot)
+//      {
+        if(selectedIDs[thNum][i] != 255)
         {
-          Serial.printf("SelectedID %d\n\r", selectedIDs[i]);
+          Serial.printf("SelectedID %d\n\r", selectedIDs[thNum][i]);
           nextionSetText("n" + String(i),"");                                                                                   //Blank out if unused
-          nextionSetText("t" + String(i), readEEPROMName(locoTypeBase + (selectedIDs[i]* (locoNameLen))));                      //Loco Type
-          nextionSetText("n" + String(i), readEEPROMName(locoNameBase + (selectedIDs[i] * (locoNameLen))));                     //Road Name
-          if((readLocoAddress(selectedIDs[i])) == 0)
+          nextionSetText("t" + String(i), readEEPROMName(locoTypeBase + (selectedIDs[thNum][i]* (locoNameLen))));                      //Loco Type
+          nextionSetText("n" + String(i), readEEPROMName(locoNameBase + (selectedIDs[thNum][i] * (locoNameLen))));                     //Road Name
+          if((readLocoAddress(selectedIDs[thNum][i])) == 0)
           {
-            Serial.printf("6. Active Slot: %d\n\r", activeSlot);
             nextionSetText("v" + String(i),"");
             nextionSetText("t" + String(i),"");
             nextionSetText("n" + String(i),"");
@@ -244,21 +244,20 @@ void populateSlots()
           {
             if(readEEPROMByte(eeRNumEnabled) == 0)
             {
-              nextionSetText("v" + String(i), String(readLocoAddress(selectedIDs[i])));
+              nextionSetText("v" + String(i), String(readLocoAddress(selectedIDs[thNum][i])));
             }else //Road Number NOT enabled
             {
-              nextionSetText("v" + String(i), String(readLocoRNum(selectedIDs[i])));
+              nextionSetText("v" + String(i), String(readLocoRNum(selectedIDs[thNum][i])));
             }
             nextionCommand("v" + String(i) + ".pco=" + String(WHITE));
           }
         }else //selectedID == 255 
         {
-          Serial.printf("3. Active Slot: %d\n\r", activeSlot);
           nextionSetText("v" + String(i),"");
           nextionSetText("t" + String(i),"");
           nextionSetText("n" + String(i),"");
         }
-      } //end of inactive SLot
+    //  } //end of inactive SLot
     }else //Guest IS active
     {
       nextionSetText("v" + String(i),"");
@@ -295,7 +294,7 @@ void activateSlot(uint8_t slot)
       nextionCommand("t" + String(slot) + ".bco=" + String(GREY));   //Loco Type Field background Colour
       nextionCommand("v" + String(slot) + ".bco=" + String(GREY));   //Address/Road Number Field background Colour
     #endif
-    if((readLocoAddress(selectedIDs[slot])) == 0 || selectedIDs[slot] == 255)
+    if((readLocoAddress(selectedIDs[thNum][slot])) == 0 || selectedIDs[thNum][slot] == 255)
     {
       nextionSetText("v" + String(slot),"");
       nextionSetText("t" + String(slot),"");
@@ -304,34 +303,36 @@ void activateSlot(uint8_t slot)
       {
         nextionCommand(("s" + String(l_fSlot) + ".pic=" + String(BLANK)).c_str());   //load blank Function Image
       }
-      auto th = throttles[activeSlot];
-      Loco *loco = th->getLoco();
-      dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
-//      nextionCommand("P2.pic=260");                                       //Waiting for CS
+      nextionSetText("AD", String(0));
+
     }else
     { 
-      if(selectedIDs[slot] != 255)
+      if(selectedIDs[thNum][slot] != 255)
       {
-        Serial.printf("5. Active Slot: %d\n\r", activeSlot);
-        nextionSetText("LName", longLocoNames[selectedIDs[slot]]);
-        wait(50);
-        nextionSetText("n" + String(slot), readEEPROMName(locoNameBase + (selectedIDs[slot] * (locoNameLen))));         //Road Name
-        nextionSetText("t" + String(slot), readEEPROMName(locoTypeBase + (selectedIDs[slot]* (locoNameLen))));       //Loco Type  
-        if(readEEPROMByte(eeRNumEnabled) == 0)
-        {
-          nextionSetText("v" + String(slot), String(readLocoAddress(selectedIDs[slot])));
-        }else{
-          nextionSetText("v" + String(slot), String(readLocoRNum(selectedIDs[slot])));
-        }
-        nextionCommand("v" + String(slot) + ".pco=" + String(BLACK));   //Font Colour
-        auto th = throttles[activeSlot];
+//        auto th = throttles[selectedIDs[thNum][slot]];
+        auto th = throttles[slot];
         Loco *loco = th->getLoco();
         dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
+        nextionSetText("LName", longLocoNames[selectedIDs[thNum][slot]]);
+        wait(50);
+        nextionSetText("n" + String(slot), readEEPROMName(locoNameBase + (selectedIDs[thNum][slot] * (locoNameLen))));         //Road Name
+        nextionSetText("t" + String(slot), readEEPROMName(locoTypeBase + (selectedIDs[thNum][slot]* (locoNameLen))));       //Loco Type  
+        if(readEEPROMByte(eeRNumEnabled) == 0)
+        {
+          nextionSetText("v" + String(slot), String(readLocoAddress(selectedIDs[thNum][slot])));
+        }else{
+          nextionSetText("v" + String(slot), String(readLocoRNum(selectedIDs[thNum][slot])));
+        }
+        nextionCommand("v" + String(slot) + ".pco=" + String(BLACK));   //Font Colour
+//        auto th = throttles[activeSlot];
+//        Loco *loco = th->getLoco();
+//        dccexProtocol.setThrottle(loco, loco->getSpeed(), loco->getDirection());
 //        nextionCommand("P2.pic=260");                                       //Waiting for CS
         updateNextionThrottle(loco->getSpeed());
         nextionSetValue(F("FR"), (loco->getDirection()));
         nextionSetText("AD", String(loco->getAddress()));
-        loadFunctions(ThrottlePage, selectedIDs[slot]);
+        Serial.printf("Active Address set to: %d\n\r", loco->getAddress());
+        loadFunctions(ThrottlePage, selectedIDs[thNum][slot]);
       }    
     }
   }
@@ -414,91 +415,91 @@ uint8_t toggleFunction(uint8_t funcNum, uint8_t funcImg)
   #if defined DCCPP
     if (funcNum == 0)
     {
-      if (bitRead(LocoFN0to4[selectedIDs[activeSlot]], 4) == 0)     //if function off
+      if (bitRead(LocoFN0to4[selectedIDs[thNum][activeSlot]], 4) == 0)     //if function off
       {
       funcImg = funcImg + 1;  
-      bitWrite(LocoFN0to4[selectedIDs[activeSlot]], 4, 1);        //set function on
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN0to4[selectedIDs[thNum][activeSlot]], 4, 1);        //set function on
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else
     {
-      bitWrite(LocoFN0to4[selectedIDs[activeSlot]], 4, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN0to4[selectedIDs[thNum][activeSlot]], 4, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction04();
   }
   if (funcNum >= 1 && funcNum <= 4)
   {
-    if (bitRead(LocoFN0to4[selectedIDs[activeSlot]], funcNum-1) == 0)
+    if (bitRead(LocoFN0to4[selectedIDs[thNum][activeSlot]], funcNum-1) == 0)
     {
       funcImg = funcImg + 1;
-      bitWrite(LocoFN0to4[selectedIDs[activeSlot]], funcNum-1, 1); 
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN0to4[selectedIDs[thNum][activeSlot]], funcNum-1, 1); 
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else
     {
-      bitWrite(LocoFN0to4[selectedIDs[activeSlot]], funcNum-1, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN0to4[selectedIDs[thNum][activeSlot]], funcNum-1, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction04();
   }
   if (funcNum >= 5 && funcNum <= 8)
   {
-    if (bitRead(LocoFN5to8[selectedIDs[activeSlot]], funcNum-5) == 0 ) 
+    if (bitRead(LocoFN5to8[selectedIDs[thNum][activeSlot]], funcNum-5) == 0 ) 
     {
       funcImg = funcImg + 1;
-      bitWrite(LocoFN5to8[selectedIDs[activeSlot]], funcNum-5, 1);
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN5to8[selectedIDs[thNum][activeSlot]], funcNum-5, 1);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else 
     {
-      bitWrite(LocoFN5to8[selectedIDs[activeSlot]], funcNum-5, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN5to8[selectedIDs[thNum][activeSlot]], funcNum-5, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction58();
   }
   if (funcNum >= 9 && funcNum <= 12)
   {
-    if (bitRead(LocoFN9to12[selectedIDs[activeSlot]], funcNum-9) == 0 ) 
+    if (bitRead(LocoFN9to12[selectedIDs[thNum][activeSlot]], funcNum-9) == 0 ) 
     {
       funcImg = funcImg + 1;
-      bitWrite(LocoFN9to12[selectedIDs[activeSlot]], funcNum-9, 1);
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN9to12[selectedIDs[thNum][activeSlot]], funcNum-9, 1);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else 
     {
-      bitWrite(LocoFN9to12[selectedIDs[activeSlot]], funcNum-9, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN9to12[selectedIDs[thNum][activeSlot]], funcNum-9, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction912();
   }
   if (funcNum >= 13 && funcNum <= 20)
   {
-    if (bitRead(LocoFN13to20[selectedIDs[activeSlot]], funcNum-13) == 0 )
+    if (bitRead(LocoFN13to20[selectedIDs[thNum][activeSlot]], funcNum-13) == 0 )
     {
       funcImg = funcImg + 1;
-      bitWrite(LocoFN13to20[selectedIDs[activeSlot]], funcNum-13, 1);
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN13to20[selectedIDs[thNum][activeSlot]], funcNum-13, 1);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else 
     {
-      bitWrite(LocoFN13to20[selectedIDs[activeSlot]], funcNum-13, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN13to20[selectedIDs[thNum][activeSlot]], funcNum-13, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction1320();                                                        //Set up Command to Command Station
   }
   if (funcNum >= 21 && funcNum <= 28)
   {
-    if (bitRead(LocoFN21to28[selectedIDs[activeSlot]], funcNum-21) == 0 )         //Function 21 is bit 0 of LocoFN21to28
+    if (bitRead(LocoFN21to28[selectedIDs[thNum][activeSlot]], funcNum-21) == 0 )         //Function 21 is bit 0 of LocoFN21to28
     {
       funcImg = funcImg + 1;
-      bitWrite(LocoFN21to28[selectedIDs[activeSlot]], funcNum-21, 1);
-      functions[selectedIDs[activeSlot]][g_fSlot]=1;
+      bitWrite(LocoFN21to28[selectedIDs[thNum][activeSlot]], funcNum-21, 1);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=1;
     }
     else 
     {
-      bitWrite(LocoFN21to28[selectedIDs[activeSlot]], funcNum-21, 0);
-      functions[selectedIDs[activeSlot]][g_fSlot]=0;
+      bitWrite(LocoFN21to28[selectedIDs[thNum][activeSlot]], funcNum-21, 0);
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot]=0;
     }
     doDCCfunction2128();                                                      //Set up Command to Command Station
     }
@@ -506,14 +507,14 @@ uint8_t toggleFunction(uint8_t funcNum, uint8_t funcImg)
   #endif
 
   #if !defined DCCPP
-    if(functions[selectedIDs[activeSlot]][g_fSlot] == 0)
+    if(functions[selectedIDs[thNum][activeSlot]][g_fSlot] == 0)
     {
       funcImg = funcImg + 1;
-      functions[selectedIDs[activeSlot]][g_fSlot] = 1;
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot] = 1;
     }
     else
     {
-      functions[selectedIDs[activeSlot]][g_fSlot] = 0;
+      functions[selectedIDs[thNum][activeSlot]][g_fSlot] = 0;
     }
     doDCCfunctions(funcNum);
     return(funcImg);
@@ -526,12 +527,28 @@ uint8_t toggleFunction(uint8_t funcNum, uint8_t funcImg)
 */
 void changeDir(uint8_t dir)
 {
-  locos[selectedIDs[activeSlot]].dir = dir;
+  locos[selectedIDs[thNum][activeSlot]].dir = dir;
   if (encoderPos >= readEEPROMByte(eeThreshold))
   {
-    locos[selectedIDs[activeSlot]].speed = 0;
+    locos[selectedIDs[thNum][activeSlot]].speed = 0;
     encoderPos = 0;
     oldEncPos = 0;
   }
   //doDCC(activeSlot);
+}
+/*
+* Create Throttles for the Throttle Page
+*/
+void createThrottles(uint8_t thNum)
+{
+  for(int i =0; i<(numLocoSlots); i++)
+  {
+    Serial.print("Create throttle|loco address: ");
+    Serial.print(i);
+    Serial.print("|");
+    Serial.println(readLocoAddress(selectedIDs[thNum][i]));
+    throttles[i] = new Throttle(&dccexProtocol);
+    throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[thNum][i]), LocoSource::LocoSourceEntry));
+    resumeSpeeds[i]=0;
+  }
 }

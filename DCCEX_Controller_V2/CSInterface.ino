@@ -298,13 +298,13 @@ void parse(char *com)
 void doDCC(uint8_t locoSlot) 
 {
   String dccppCMD = "";
-  if(readLocoAddress(selectedIDs[locoSlot]) != 0){
+  if(readLocoAddress(selectedIDs[thNum][locoSlot]) != 0){
     #if defined DCCPP
-      dccppCMD = ("<t " + String(selectedIDs[locoSlot] + 1) + " " + String(readLocoAddress(selectedIDs[locoSlot])) + " "
-             + String(locos[selectedIDs[locoSlot]].speed ) + " " + String(locos[selectedIDs[locoSlot]].dir ) + ">");
+      dccppCMD = ("<t " + String(selectedIDs[thNum][locoSlot] + 1) + " " + String(readLocoAddress(selectedIDs[thNum][locoSlot])) + " "
+             + String(locos[selectedIDs[thNum][locoSlot]].speed ) + " " + String(locos[selectedIDs[thNum][locoSlot]].dir ) + ">");
     #else
-      dccppCMD = ("<t " + String(readLocoAddress(selectedIDs[locoSlot])) + " "
-             + String(locos[selectedIDs[locoSlot]].speed ) + " " + String(locos[selectedIDs[locoSlot]].dir ) + ">");
+      dccppCMD = ("<t " + String(readLocoAddress(selectedIDs[thNum][locoSlot])) + " "
+             + String(locos[selectedIDs[thNum][locoSlot]].speed ) + " " + String(locos[selectedIDs[thNum][locoSlot]].dir ) + ">");
     #endif
     sendCMD(dccppCMD);
   }
@@ -319,36 +319,36 @@ void doDCC(uint8_t locoSlot)
   void doDCCfunction04() 
   {
   String dccppCMD = "";
-  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[activeSlot]))) +
-                    " " + String(LocoFN0to4[selectedIDs[activeSlot]]) + ">");
+  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) +
+                    " " + String(LocoFN0to4[selectedIDs[thNum][activeSlot]]) + ">");
   sendCMD(dccppCMD);
 }
 void doDCCfunction58() 
 {
   String dccppCMD = "";
-  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[activeSlot]))) +
-                    " " + String(LocoFN5to8[selectedIDs[activeSlot]]) + ">");
+  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) +
+                    " " + String(LocoFN5to8[selectedIDs[thNum][activeSlot]]) + ">");
   sendCMD(dccppCMD);
 }
 void doDCCfunction912()          
 {
   String dccppCMD = "";
-  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[activeSlot]))) +
-                    " " + String(LocoFN9to12[selectedIDs[activeSlot]]) + ">");
+  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) +
+                    " " + String(LocoFN9to12[selectedIDs[thNum][activeSlot]]) + ">");
   sendCMD(dccppCMD);
 }
 void doDCCfunction1320()         
 {
   String dccppCMD = "";
-  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[activeSlot]))) + " " + String(fGroup4) +
-                    " " + String(LocoFN13to20[selectedIDs[activeSlot]]) + ">");
+  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) + " " + String(fGroup4) +
+                    " " + String(LocoFN13to20[selectedIDs[thNum][activeSlot]]) + ">");
   sendCMD(dccppCMD);
 }
 void doDCCfunction2128()         
 {
   String dccppCMD = "";
-  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[activeSlot]))) + " " + String(fGroup5)+
-                    " " + String(LocoFN21to28[selectedIDs[activeSlot]]) + ">");
+  dccppCMD = ("<f " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) + " " + String(fGroup5)+
+                    " " + String(LocoFN21to28[selectedIDs[thNum][activeSlot]]) + ">");
   sendCMD(dccppCMD);
 }
 #endif
@@ -360,9 +360,9 @@ void doDCCfunction2128()
   }
 /*  {
     String dccppCMD = "";
-    dccppCMD = ("<F " + String(readLocoAddress((selectedIDs[activeSlot]))) +
+    dccppCMD = ("<F " + String(readLocoAddress((selectedIDs[thNum][activeSlot]))) +
               " " + String(fNum) + 
-              " " + String(functions[selectedIDs[activeSlot]][g_fSlot]) + ">");
+              " " + String(functions[selectedIDs[thNum][activeSlot]][g_fSlot]) + ">");
     sendCMD(dccppCMD);
   }
 */

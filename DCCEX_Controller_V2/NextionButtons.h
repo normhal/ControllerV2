@@ -101,9 +101,10 @@
 #define MidText_Press 176
 #define MidVal_Press 177
 
-#define MaxText_Press 178           //*** 
 #define LoadButton 178              //***
+#define EXButton 179
 
+#define MaxText_Press 178           //*** 
 #define MaxVal_Press 179
 
 #define AccelText_Press 180         //***

@@ -52,11 +52,11 @@ void loadHardCodedValues()
       }
     }
     #if defined HCL_ALL10
-      if(i <10) selectedIDs[i] = i;
+      if(i <10) selectedIDs[thNum][i] = i;
     #else
       if(hcLocos[i].FavSlot != "") 
       {
-        selectedIDs[hcLocos[i].FavSlot.toInt()] = i;
+        selectedIDs[thNum][hcLocos[i].FavSlot.toInt()] = i;
       }
     #endif
   }

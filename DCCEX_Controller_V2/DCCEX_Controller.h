@@ -19,13 +19,13 @@
 #ifndef DCCEXCONTROLLER_H
   #define DCCEXCONTROLLER_H
 
-  #define Version "V2.0.4"
+  #define Version "V2.0.5"
   uint8_t EEPROMCODE = 200;
   String TFT_SUFFIX = ".tft";
   
   #include <EEPROM.h>
   #include <DCCEXProtocol.h>
-  //#include <LittleFS.h>
+  #include <LittleFS.h>
   
   #include "NextionButtons.h"
 
@@ -155,37 +155,7 @@
     TFTs,
     IPs
   };
-/*
-  enum IDs
-  {
-    AD = 1,
-    TH,
-    GL,
-    FN,
-    RN,
-    LT,
-    C2,
-    C6,
-    C5,
-    C3,
-    C4,
-    CN,
-    CV,
-    N0,
-    N1,
-    N2,
-    N3,
-    SS,
-    PA,
-    IP,
-    PO,
-    RC,
-    AA,
-    AN,
-    FF,
-    TN
-  };
-*/
+
   void buttonScheduler();
   void goButton();
   void stopButton();
@@ -291,6 +261,7 @@
   void selectionPage(uint8_t);
   void fillSelection(enum List listName);
   bool connectOTAUpload();
+  void createThrottles(uint8_t);
 
   //**************************************************************************************
 
@@ -720,11 +691,15 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   unsigned int highest = 126; //126;
   bool rcvCMD = false;
   //bool editMode  = false;
+  const uint8_t tCount = 4;
 
   uint8_t accSlot;
   uint8_t activeSlot;
   uint8_t previousSlot;
-  uint8_t selectedIDs[numLocoSlots];
+  uint8_t selectedIDs[tCount][numLocoSlots] = {{0,1,2,3,4,5,6,7,8,9},
+                                              {10,11,12,13,14,15,16,17,18,19},
+                                              {20,21,22,23,24,25,26,27,28,29},
+                                              {30,31,32,33,34,35,36,37,38,39}};
   uint8_t resumeSpeeds[numLocoSlots];
   uint8_t backupID;
   uint8_t editingID;
@@ -810,5 +785,5 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   long int wifiTimer = 0;
   long int wifiTimeout = 0;
   uint8_t savedSlot = 0;
-
+  uint8_t thNum = 0;            //Throttle Number
 #endif

@@ -158,8 +158,7 @@ void initEEPROM()
   uint8_t j = 255;
   for (uint16_t i = eeSelIDs; i < (eeSelIDs + numLocoSlots); i++)
   {
-    writeEEPROMByte(i ,j);  //Initialize the Selected IDs with incrementing values from 0 to numLocoSlots
-//    j++;
+    writeEEPROMByte(i ,j);  //Initialize selectedIDs with no IDs
   }
   writeEEPROMByte(eeJoinMode, JOIN_OPTION);
   writeEEPROMByte(eeRNumEnabled, RNUM_ENABLED);
@@ -424,7 +423,7 @@ void saveSelected()
   uint8_t c = 0;
   for (uint16_t s = eeSelIDs; s < (eeSelIDs+numLocoSlots); s++)
   {
-    writeEEPROMByte(s, selectedIDs[c]);
+    writeEEPROMByte(s, selectedIDs[thNum][c]);
     c++;
   }
   writeEEPROMByte(eeActiveSlot,activeSlot);
@@ -440,7 +439,7 @@ void restoreSelected()
   uint8_t r = 0;
   for (uint16_t s = eeSelIDs; s < (eeSelIDs + numLocoSlots); s++)
   {
-    selectedIDs[r] = readEEPROMByte(s);
+    selectedIDs[thNum][r] = readEEPROMByte(s);
     r++;
   }
 }

@@ -36,16 +36,6 @@ void buttonScheduler()
   }
   if (message != "")
   {
-    if(message.startsWith("NNN") || message.startsWith("TTT"))       //Nextion Sending Text
-    {
-      nextionGetText(message.substring(3));
-      return;
-    }
-/*
-#if defined WIFI
-    if(client.connected()) nextionCommand("P2.pic=258"); else nextionCommand("P2.pic=259");
-#endif
-*/
     button = message.toInt();
     switch (button)
     {
@@ -219,7 +209,17 @@ void menuPage(uint8_t button)
     restoreSelected();
     return;
   }
-  if (button != 0) initPage(button);
+  if(button >=20 && button <= 23)
+  {
+    button = button - 20;
+    thNum = button;
+    initPage(ThrottlePage);
+    return;
+  }
+  if(button != 0) 
+  {
+    initPage(button);
+  }
 }
 /*
  *************************************************************************************************************************

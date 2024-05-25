@@ -36,7 +36,7 @@
     char *LocoType;          //Max 8 Characters
     uint16_t RoadNumber;    
     uint16_t LocoAddress;
-    String FavSlot;                         //Slot (0-9) for selectedIDs[] if present
+    String FavSlot;                         //Slot (0-9) for selectedIDs[thNum][] if present
     uint8_t FSlot[NUM_FSLOTS][4];         //10 Functions, then Function Slot number, Function Number, Function Image for each function
   };
 
