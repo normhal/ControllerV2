@@ -249,6 +249,9 @@ void populateSlots()
             {
               nextionSetText("v" + String(i), String(readLocoRNum(selectedIDs[thNum][i])));
             }
+            nextionCommand("n" + String(i) + ".bco=" + String(THGREY));
+            nextionCommand("t" + String(i) + ".bco=" + String(THGREY)); 
+            nextionCommand("v" + String(i) + ".bco=" + String(THGREY)); 
             nextionCommand("v" + String(i) + ".pco=" + String(WHITE));
           }
         }else //selectedID == 255 
@@ -344,9 +347,9 @@ void activateSlot(uint8_t slot)
 */
 void deActivateSlot(uint8_t slot)
 {
-    nextionCommand("n" + String(slot) + ".bco=" + String(DARK_GREY));
-    nextionCommand("t" + String(slot) + ".bco=" + String(DARK_GREY)); 
-    nextionCommand("v" + String(slot) + ".bco=" + String(DARK_GREY)); 
+    nextionCommand("n" + String(slot) + ".bco=" + String(THGREY));
+    nextionCommand("t" + String(slot) + ".bco=" + String(THGREY)); 
+    nextionCommand("v" + String(slot) + ".bco=" + String(THGREY)); 
     nextionCommand("n" + String(slot) + ".pco=" + String(BLACK)); 
     nextionCommand("t" + String(slot) + ".pco=" + String(BLACK));
     nextionCommand("v" + String(slot) + ".pco=" + String(WHITE));

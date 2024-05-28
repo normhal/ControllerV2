@@ -25,7 +25,7 @@
   
   #include <EEPROM.h>
   #include <DCCEXProtocol.h>
-  //#include <LittleFS.h>
+  #include <LittleFS.h>
   
   #include "NextionButtons.h"
 
@@ -653,7 +653,7 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   const uint16_t GREY = GREY_TO_USE;
   //const uint16_t GREY = 50712;
 
-  const uint16_t DARK_GREY = 25388;
+//  const uint16_t DARK_GREY = 25388;
   const uint16_t YELLOW = 65504;
   /*
   ************************************************************************************************************************
@@ -690,9 +690,8 @@ const uint16_t accStartAddress = 440;   //locoAddressBlock(40) + funcDetailsBloc
   unsigned int lowest = 0;
   unsigned int highest = 126; //126;
   bool rcvCMD = false;
-  //bool editMode  = false;
+  
   const uint8_t tCount = 4;
-
   uint8_t accSlot;
   uint8_t activeSlot;
   uint8_t previousSlot;

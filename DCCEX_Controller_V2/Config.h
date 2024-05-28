@@ -30,6 +30,11 @@
 
   //#define DCCPP                   //Un-comment for DCC++ else DCCEX
 
+  //#define THGREY 50712    //VERY LIGHT (Same as BACKGROUND GREY)
+  #define THGREY 40147    //Erik's
+  //#define THGREY 25388  //Norm's
+  //define THGREY 19049   //Bob's
+
   #define ENABLE_OTA
 
   #define RNUM_ENABLED ON         //Enables Road Number (ON) or Address (OFF) on Throttle Tabs

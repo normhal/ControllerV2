@@ -3,7 +3,7 @@
 //If DCCEX is in STA mode they should be to connect to the Local Network
 String ssid       = "ssid";
 String password   = "password";
-String host       = "10.0.0.16";        //The IP Address of DCCEX
+String host       = "10.0.0.22";        //The IP Address of DCCEX
 uint16_t port     = 2560;
 
 //Credentials for Nextion Update
