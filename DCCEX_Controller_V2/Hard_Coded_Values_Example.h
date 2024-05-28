@@ -75,6 +75,17 @@
 	 *  the "Load" button on the Config Page will only populate slots 0, 1, 3, 4, 5, 7, 8, and 9
   */
 
+/*
+ * Setup 4 Throttles with required IDs
+ */
+
+//uint8_t selectedIDs[tCount][numLocoSlots];
+
+//selectedIDs[thNum][] = {0,1,2,3,4,5,6,7,8,9};
+//selectedIDs[1][] = {10,11,12,13,14,15,16,17,18,19};
+//selectedIDs[2][] = {20,21,22,23,24,25,26,27,28,29};
+//selectedIDs[3][] = {30,31,32,33,34,35,36,37,38,39};
+
 #define NUM_HCLOCOS 20
 
 HCLoco hcLocos[NUM_HCLOCOS] = 
@@ -89,16 +100,16 @@ HCLoco hcLocos[NUM_HCLOCOS] =
   {"Cleaner", "Cleaner", 126, 126,  "7",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
   {"NYC P&LE", "S4 NY Central", 752, 62,  "8",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
   {"NH", "44Ton NH", 8662, 18,  "9",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"Montana", "F45 EMD", 58, 91,  "10",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN},{3, f8, ENGINE}}}, 
-  {"Nor Sthr", "GEVO ET 44AC", 58, 63,  "11",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"CN BCOL", "Dash 8 40CW", 58, 46,  "12",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
-  {"PRR", "SD 9", 58, 7,  "13",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"GN", "VO1000", 58, 53,  "14",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"BNSF", "Dash 8B", 58, 86,  "15",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"Union P", "GP20 47", 58, 47,  "16",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"Conrail", "SD60-M", 58, 23,  "17",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
-  {"C&P RD", "GP9 TT", 58, 75,  "18",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
-  {"Cleaner", "GN BNDY", 58, 54,  "19",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"Montana", "F45 EMD", 91, 91,  "10",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN},{3, f8, ENGINE}}}, 
+  {"Nor Sthr", "GEVO ET 44AC", 63, 63,  "11",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"CN BCOL", "Dash 8 40CW", 46, 46,  "12",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
+  {"PRR", "SD 9", 7, 7,  "13",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"GN", "VO1000", 53, 53,  "14",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"BNSF", "Dash 8B", 86, 86,  "15",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"Union P", "GP20 47", 47, 47,  "16",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"Conrail", "SD60-M", 23, 23,  "17",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}},
+  {"C&P RD", "GP9 TT", 75, 75,  "18",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
+  {"Cleaner", "GN BNDY", 54, 54,  "19",{{0, f0, F0},{1, f1,BELL},{2,f2,HORN,PULSED},{3, f8, ENGINE}}}, 
 };
 
 String longLocoNames[20] = 
@@ -149,17 +160,17 @@ String longLocoNames[20] =
 
 HCAcc hcAcc[NUM_HCACCS] = {
   { "ACC1", 100, LH0},    //Name, Address, Image, Type
-  { "ACC2", 101, RH180},
-  { "ACC3", 102, RH0},
-  { "ACC4", 103, LH180},
-  { "ACC5", 104, RH0},
-  { "ACC6", 105, LH180},
-  { "ACC7", 106, LH0},
-  { "ACC8", 107, RH180},
-  { "ACC9", 108, LH0},
-  { "ACC10", 109, RH180},
-  { "ACC11", 110, LH0},
-  { "ACC12", 111, RH180},
+  { "ACC2", 102, RH180},
+  { "ACC3", 104, RH0},
+  { "ACC4", 106, LH180},
+  { "ACC5", 108, RH0},
+  { "ACC6", 110, LH180},
+  { "ACC7", 112, LH0},
+  { "ACC8", 114, RH180},
+  { "ACC9", 116, LH0},
+  { "ACC10", 118, RH180},
+  { "ACC11", 120, LH0},
+  { "ACC12", 122, RH180},
 };
 /*
  * Hard Coded Values for ROUTES

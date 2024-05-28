@@ -100,7 +100,7 @@ void configPage(uint8_t button)
     }
     case LoadButton:    //Code to load pre-defined details
     {
-      nextionCommand(("Load.pic=" + String(BUTTON_ON)).c_str());
+      nextionCommand(("L.pic=" + String(BUTTON_ON)).c_str());
       #if defined HARD_CODED_VALUES
         loadHardCodedValues();
         if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
@@ -108,7 +108,7 @@ void configPage(uint8_t button)
         console.println("Hard Coded Details NOT defined!");
       #endif
       wait(1000);
-      nextionCommand(("Load.pic=" + String(BUTTON_OFF)).c_str());
+      nextionCommand(("L.pic=" + String(BUTTON_OFF)).c_str());
       break;
     }
     case Join_On:

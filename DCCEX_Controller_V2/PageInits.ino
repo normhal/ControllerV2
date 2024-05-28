@@ -32,6 +32,7 @@ void initPage(uint8_t page)
     //******************************************************************************************************************************
     case ThrottlePage:
     {  
+      createThrottles(thNum);
       populateSlots();
       activateSlot(activeSlot);
       break;
@@ -48,7 +49,7 @@ void initPage(uint8_t page)
         nextionSetText("RN", readEEPROMName(locoNameBase + (editingID * (locoNameLen))));      //Get Loco Name from Integrated EEPROM
         nextionSetText("LT", readEEPROMName(locoTypeBase + (editingID * (locoTypeLen))));      //Get Loco Type from Integrated EEPROM
       }
-      nextionSetText("FName", longLocoNames[selectedIDs[editingID]]);
+      nextionSetText("FName", longLocoNames[selectedIDs[thNum][editingID]]);
       nextionSetText("LN", String(readLocoRNum(editingID)));
       loadFunctions(LocoEditPage, editingID);
       break;
@@ -56,7 +57,7 @@ void initPage(uint8_t page)
     //******************************************************************************************************************************
     case LocosPage:
     {
-      backupID = selectedIDs[activeSlot];       //Used by "Cancel" button
+      backupID = selectedIDs[thNum][activeSlot];       //Used by "Cancel" button
       locosDrawPage(locoStartID);
       break;
     }
@@ -112,8 +113,8 @@ void initPage(uint8_t page)
       nextionCommand("LName.pco=" + String(GREY));
       nextionCommand("AD.pco=" + String(GREY));
       nextionCommand("AD.bco=" + String(GREY));
-      nextionSetText("AD", String(readLocoAddress(selectedIDs[activeSlot])));
-      nextionSetText("LName", String(longLocoNames[selectedIDs[activeSlot]]));
+      nextionSetText("AD", String(readLocoAddress(selectedIDs[thNum][activeSlot])));
+      nextionSetText("LName", String(longLocoNames[selectedIDs[thNum][activeSlot]]));
       nextionSetText("CVN", "");
       nextionSetText("CVV", "");
       nextionSetText("S0", "Select Main or Prog First");
@@ -221,6 +222,33 @@ void initPage(uint8_t page)
     //******************************************************************************************************************************
     case MenuPage:
     {
+      switch(thNum)
+      {
+        case 0:
+          nextionCommand("t1.pic=266");
+          nextionCommand("t2.pic=267");
+          nextionCommand("t3.pic=269");
+          nextionCommand("t4.pic=271");
+          break;
+        case 1:
+          nextionCommand("t1.pic=265");
+          nextionCommand("t2.pic=268");
+          nextionCommand("t3.pic=269");
+          nextionCommand("t4.pic=271");
+          break;
+        case 2:
+          nextionCommand("t1.pic=265");
+          nextionCommand("t2.pic=267");
+          nextionCommand("t3.pic=270");
+          nextionCommand("t4.pic=271");
+          break;
+        case 3:
+          nextionCommand("t1.pic=265");
+          nextionCommand("t2.pic=267");
+          nextionCommand("t3.pic=269");
+          nextionCommand("t4.pic=272");
+          break;
+      } 
       break;
     }
     default:

@@ -27,7 +27,7 @@ void updateSpeed()
     oldEncPos = encoderPos;
     if(guestActive == 0)
     { 
-      locos[selectedIDs[activeSlot]].speed = encoderPos;
+      locos[selectedIDs[thNum][activeSlot]].speed = encoderPos;
       doDCC(activeSlot);
     }else{
       updateNextionThrottle(encoderPos);
@@ -57,7 +57,7 @@ void checkREButton()
       {
         if(guestActive == 0)
         {
-          locos[selectedIDs[activeSlot]].speed = 0;
+          locos[selectedIDs[thNum][activeSlot]].speed = 0;
           encoderPos = 0;
           oldEncPos = 0;
           directionFlag = 1;
@@ -76,14 +76,14 @@ void checkREButton()
         dir = !dir;
         if (encoderPos >= readEEPROMByte(eeThreshold))
         {
-          locos[selectedIDs[activeSlot]].speed = 0;
+          locos[selectedIDs[thNum][activeSlot]].speed = 0;
           encoderPos = 0;
           oldEncPos = 0;
         }
         if(dir) nextionSetValue(F("FR"), 1);
         else nextionSetValue(F("FR"), 0);
         currentMillis = millis();
-        locos[selectedIDs[activeSlot]].dir = dir;
+        locos[selectedIDs[thNum][activeSlot]].dir = dir;
         doDCC(activeSlot);
       }else
       {

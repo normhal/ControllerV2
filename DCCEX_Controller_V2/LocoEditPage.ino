@@ -29,7 +29,7 @@ void locoEditPage(uint8_t button)
   String receivedID = message.substring(2);
   if(message.startsWith("FN"))
   {
-    longLocoNames[selectedIDs[editingID]] = receivedID;
+    longLocoNames[selectedIDs[thNum][editingID]] = receivedID;
     return;
   }
   if(message.startsWith("AD"))
@@ -61,7 +61,7 @@ void locoEditPage(uint8_t button)
     }
     case Done_Press:
     {
-      if(eMode == 2) selectedIDs[activeSlot] = 255;
+      if(eMode == 2) selectedIDs[thNum][activeSlot] = 255;
       eMode = 0;                                      //Turn off Edit Mode
       nextionSetValue("Edit", 0);                     //Force EDIT Button OFF
       nextionSetValue("Remove", 0);                     //Force EDIT Button OFF

@@ -166,7 +166,7 @@ class MyDelegate : public DCCEXProtocolDelegate
       {
         nextionCommand("FR.pic=9");
       }
-      if(guestActive == false) loadFunctions(ThrottlePage, selectedIDs[activeSlot]);
+      if(guestActive == false) loadFunctions(ThrottlePage, selectedIDs[thNum][activeSlot]);
     }
 };
 
@@ -242,7 +242,7 @@ void setup()
   uint8_t r = 0;
   for (uint16_t s = eeSelIDs; s < (eeSelIDs + numLocoSlots); s++)
   {
-    selectedIDs[r] = readEEPROMByte(s);
+    selectedIDs[thNum][r] = readEEPROMByte(s);
     r++;
   }
   joinMode = readEEPROMByte(eeJoinMode);
@@ -282,19 +282,10 @@ void setup()
   nextionSetText("V", String(Version));
   wait(3000);
 
-  dccexProtocol.setDelegate(&myDelegate);
+  dccexProtocol.setDelegate(&myDelegate);               
   dccexProtocol.connect(&client);
-  Serial.println("DCC-EX connected");
-  for(int i =0; i<(numLocoSlots); i++)
-  {
-    Serial.print("Create throttle|loco address: ");
-    Serial.print(i);
-    Serial.print("|");
-    Serial.println(readLocoAddress(selectedIDs[i]));
-    throttles[i] = new Throttle(&dccexProtocol);
-    throttles[i]->setLoco(new Loco(readLocoAddress(selectedIDs[i]), LocoSource::LocoSourceEntry));
-    resumeSpeeds[i]=0;
-  }
+  Serial.println("WiFi Client Started...");                  //
+  createThrottles(0);                     //Create 10 throttles for Throttle Page A
   throttles[numLocoSlots] = new Throttle(&dccexProtocol);                         //Create the Guest Throttle
   throttles[numLocoSlots]->setLoco(new Loco(0, LocoSource::LocoSourceEntry));
   

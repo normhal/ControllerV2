@@ -36,13 +36,13 @@
 
   #define NEXTION_UPLOAD          //Enables support for remote updating of Nextion HMI (not supported on Pico yet)
 
-  #define ENABLE_ROTARY_ENCODER //Comment out to DISABLE
+  #define ENABLE_ROTARY_ENCODER   //Comment out to DISABLE
 
   #define WIFI                    //WiFi support can be disabled here
 
   #define SEND_POWER_STATE        //This option allows the Nextion Controller to send Power State Command at Power-Up
 
-//#define DISPLAY_TAB_DETAILS_GREY_BG     //This option ENABLES displaying Road Name, Number or Address, and Loco Type on ALL Throttle Tabs
+  //#define DISPLAY_TAB_DETAILS_GREY_BG     //This option ENABLES displaying Road Name, Number or Address, and Loco Type on ALL Throttle Tabs
   #define DISPLAY_TAB_DETAILS_YELLOW_BG   //As Above, but with a YELLOW background on the Active Tab
                                           //Comment BOTH Lines out to have ONLY the Address or Road Number displayed on the Active Tab
 

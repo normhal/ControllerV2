@@ -27,14 +27,14 @@ void locosPage(uint8_t button)
   {
     case Cancel_Press:
     {
-      selectedIDs[activeSlot] = backupID;
+      selectedIDs[thNum][activeSlot] = backupID;
       initPage(LocosReturnPage);                       //Always return to the Throttle page
       break;
     }
     case SelectButton:
     {
       if(readLocoAddress(selectedLocoID) == 0) return; 
-      selectedIDs[activeSlot] = selectedLocoID;   //selectedLocoID = Actual LocoID Being worked on
+      selectedIDs[thNum][activeSlot] = selectedLocoID;   //selectedLocoID = Actual LocoID Being worked on
       throttles[activeSlot]->setLoco(new Loco(readLocoAddress(selectedLocoID), LocoSource::LocoSourceEntry));
       initPage(ThrottlePage);
       break;
