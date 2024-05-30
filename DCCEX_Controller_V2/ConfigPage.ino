@@ -111,6 +111,17 @@ void configPage(uint8_t button)
       nextionCommand(("L.pic=" + String(BUTTON_OFF)).c_str());
       break;
     }
+     case EXButton:    //Code to load pre-defined details
+    {
+      nextionCommand(("EX.pic=" + String(BUTTON_ON)).c_str());
+      dccexProtocol.getLists(true, false, false, false);
+
+//        loadDCCEXValues();
+//      if(!EEPROM.commit()) console.println("EEPROM.commit Failed");
+      wait(1000);
+      nextionCommand(("EX.pic=" + String(BUTTON_OFF)).c_str());
+      break;
+    }
     case Join_On:
     {
       joinMode = ON;
@@ -141,4 +152,32 @@ void configPage(uint8_t button)
     default:
       break;
   }
+}
+
+void printRoster()
+{
+      for (Loco *loco = dccexProtocol.roster->getFirst(); loco; loco = loco->getNext()) 
+      {
+        int id = loco->getAddress();
+        char *name = loco->getName();
+        Serial.print(id);
+        Serial.print(" ~");
+        Serial.print(name);
+        Serial.println("~");
+        for (int i = 0; i < 32; i++) 
+        {
+          char *fName = loco->getFunctionName(i);
+          if (fName != nullptr) 
+          {
+            Serial.print("loadFunctionLabels() ");
+            Serial.print(fName);
+            if (loco->isFunctionMomentary(i)) 
+            {
+              Serial.print(" - Momentary");
+            }
+            Serial.println();
+          }
+        }
+      }
+      Serial.println("\n");
 }

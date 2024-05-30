@@ -262,6 +262,7 @@
   void fillSelection(enum List listName);
   bool connectOTAUpload();
   void createThrottles(uint8_t);
+  void printRoster();
 
   //**************************************************************************************
 

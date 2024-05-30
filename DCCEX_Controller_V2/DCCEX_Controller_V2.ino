@@ -145,6 +145,10 @@ class MyDelegate : public DCCEXProtocolDelegate
       else nextionCommand("Power.pic=5");
       nextionCommand("P2.pic=258");                             //CS has replied
     }
+    void receivedRosterList() 
+    {
+      printRoster();
+    }
     void receivedMessage(char *message)
     {
       Serial.print("Received Message: ");
